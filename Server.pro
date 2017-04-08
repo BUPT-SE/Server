@@ -33,5 +33,4 @@ HEADERS  += server.h \
     clientblock.h \
     attribute.h
 
-FORMS    += \
-    server.ui
+FORMS    += server.ui

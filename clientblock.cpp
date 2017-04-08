@@ -1,6 +1,6 @@
+#include "attribute.h"
 #include "clientblock.h"
 
-ClientBlock::ClientBlock()
-{
-
+Attribute ClientBlock::getAttribute(){
+    return _attribute;
 }

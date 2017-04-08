@@ -1,5 +1,6 @@
 #include "attribute.h"
-
+#include "server.h"
+#include "ui_server.h"
 QString Attribute::getRoomNum() const
 {
     return _roomNum;
@@ -15,9 +16,14 @@ int Attribute::getWindSpeed() const
     return _windSpeed;
 }
 
-void Attribute::setWindSpeed(const int &windSpeed)
+void Attribute::setWindSpeed(const QString &windSpeed)
 {
-    _windSpeed = windSpeed;
+    if(windSpeed.operator ==("Low"))
+        _windSpeed=0;
+    else if(windSpeed.operator ==("Middle"))
+        _windSpeed=1;
+    else if(windSpeed.operator ==("High"))
+        _windSpeed=2;
 }
 
 float Attribute::getRoomTmp() const
@@ -25,7 +31,7 @@ float Attribute::getRoomTmp() const
     return _roomTmp;
 }
 
-int Attribute::getMode() const
+int Attribute::getMode() const////////////////////////////////////////
 {
     return _mode;
 }

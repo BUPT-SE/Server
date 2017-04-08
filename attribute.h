@@ -14,8 +14,8 @@ public:
     //static int MODE_HEAT = 1;           //工作模式制热
 
 public:
-    Attribute();                        //构造函数
-    ~Attribute();                       //析构函数
+    //Attribute();                        //构造函数
+    //~Attribute();                       //析构函数
     QJsonObject toJson();               //把属性转化成Json格式
     void setFromJson();                 //从Json格式改变属性值
     void incRoomTmp();                  //室温升一度
@@ -25,7 +25,7 @@ public:
     QString getRoomNum() const;
     void setRoomNum(const QString &roomNum);
     int getWindSpeed() const;
-    void setWindSpeed(const int &windSpeed);
+    void setWindSpeed(const QString &windSpeed);
     float getRoomTmp() const;
     int getMode() const;
     float getTargetTmp() const;
@@ -34,7 +34,7 @@ public:
     void setPower(bool power);
     bool getIsServed() const;
     float getKWh() const;
-    //float getFee() const;
+    float getFee() const;
 
 private:
     QString _roomNum;                   //房间号
@@ -46,7 +46,7 @@ private:
     bool _isServed;                     //是否正在被服务
     float _defRoomTmp;                  //缺省室温，室温稳定值，构造函数中赋初值
     float _kWh;                         //消耗的电量
-    //flaot _fee;                         //所需支付的费用
+    float _fee;                         //所需支付的费用
 };
 
 #endif // ATTRIBUTE_H
