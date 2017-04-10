@@ -3,6 +3,7 @@
 ConfigDialog::ConfigDialog(QWidget* parent) : QDialog(parent)
 {
     //三个标签和对应的输入框
+    QLabel* loginLabel = new QLabel(QString::fromLocal8Bit("请登陆数据库"));
     QLabel* userNameLabel = new QLabel(QString::fromLocal8Bit("请输入用户名:"));
     QLabel* passwordLabel = new QLabel(QString::fromLocal8Bit("请输入密码:"));
     QLabel* hostNameLabel = new QLabel(QString::fromLocal8Bit("请输入主机地址:"));
@@ -12,12 +13,13 @@ ConfigDialog::ConfigDialog(QWidget* parent) : QDialog(parent)
 
     //网格布局
     QGridLayout* gridLayout = new QGridLayout;
-    gridLayout->addWidget(userNameLabel, 0, 0, 1, 1);
-    gridLayout->addWidget(passwordLabel, 1, 0, 1, 1);
-    gridLayout->addWidget(hostNameLabel, 2, 0, 1, 1);
-    gridLayout->addWidget(userNameEdit, 0, 1, 1, 1);
-    gridLayout->addWidget(passwordEdit, 1, 1, 1, 1);
-    gridLayout->addWidget(hostNameEdit, 2, 1, 1, 1);
+    gridLayout->addWidget(loginLabel, 0, 0, 1, 1);
+    gridLayout->addWidget(userNameLabel, 1, 0, 1, 1);
+    gridLayout->addWidget(passwordLabel, 2, 0, 1, 1);
+    gridLayout->addWidget(hostNameLabel, 3, 0, 1, 1);
+    gridLayout->addWidget(userNameEdit, 1, 1, 1, 1);
+    gridLayout->addWidget(passwordEdit, 2, 1, 1, 1);
+    gridLayout->addWidget(hostNameEdit, 3, 1, 1, 1);
 
     //确定按键
     QPushButton* okButton = new QPushButton(QString::fromLocal8Bit("确定"));
