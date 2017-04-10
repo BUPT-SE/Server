@@ -5,10 +5,13 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QList>
+#include <QLabel>
 #include "clientblock.h"
 #include <QDateTime>
 #include "attribute.h"
 #include <Qtimer>
+#include "room.h"
+
 namespace Ui {
 class Server;
 }
@@ -25,23 +28,26 @@ public:
     QTimer *timer = new QTimer(this);
     QDateTime Date=QDateTime::currentDateTime();
     QTime time=QTime::currentTime();
-    int t=0,Year,Month,Day,Hour,Min,nextClientID=1;
-    int clientID[5];
+
+
     Attribute attribute;
+    QVector<room> rooms;
 private slots:
     void on_check1_clicked();
     void on_check2_clicked();
     void on_check3_clicked();
     void on_check4_clicked();
-    void on_pushButton_clicked();
-    void on_pushButton_2_clicked();
-    void on_cold_clicked();
-    void on_hot_clicked();
+    void on_onButton_clicked();
+    void on_okButton_clicked();
+    void on_offButton_clicked();
+
 public slots:
     void onTimeOut();
 private:
     Ui::Server *ui;
     //QTcpServer _server;
     QList<ClientBlock* > _queue;//存四个从控机，最多前三个是正在被服务
+    int t,Year,Month,Day,Hour,Min,nextClientID;
+    int clientID[4];
 };
 #endif // SERVER_H

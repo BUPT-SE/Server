@@ -31,6 +31,7 @@ SOURCES += main.cpp\
 
 HEADERS  += server.h \
     clientblock.h \
-    attribute.h
+    attribute.h \
+    room.h
 
 FORMS    += server.ui
