@@ -1,5 +1,15 @@
 #include "attribute.h"
 
+void Attribute::incRoomTmp()
+{
+    _roomTmp+=0.1;
+}
+
+void Attribute::decRoomTmp()
+{
+    _roomTmp-=0.1;
+}
+
 QString Attribute::getRoomNum() const
 {
     return _roomNum;
@@ -63,4 +73,24 @@ float Attribute::getKWh() const
 float Attribute::getFee() const
 {
     return _fee;
+}
+
+void Attribute::setIsServed(bool isServed)
+{
+    _isServed = isServed;
+}
+
+void Attribute::setLowestTmp(double lowestTmp)
+{
+    _lowestTmp = lowestTmp;
+}
+
+void Attribute::setHighestTmp(double highestTmp)
+{
+    _highestTmp = highestTmp;
+}
+
+void Attribute::setMode(int mode)
+{
+    _mode = mode;
 }

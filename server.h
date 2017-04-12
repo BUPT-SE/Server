@@ -37,12 +37,14 @@ private slots:
     void on_check3_clicked();
     void on_check4_clicked();
     void on_pushButton_clicked();
-//public slots:
+public slots:
+    void timeout();
    // QDateTime dateTime=QDateTime::currentDateTime();
     //int year=dateTim
 private:
     Ui::Server *ui;
     QTcpServer _server;
+    QTimer *timer;
     QList<ClientBlock* > _queue;//存四个从控机，最多前三个是正在被服务，
 };
 

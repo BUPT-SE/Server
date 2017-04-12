@@ -3,9 +3,12 @@
 
 Server::Server(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Server)
+    ui(new Ui::Server),
+    timer(new QTimer())
 {
     ui->setupUi(this);
+    connect(timer,QTimer::timeout,this,Server::timeout);
+    timer->start(1000);
 }
 
 Server::~Server()
@@ -62,4 +65,14 @@ void Server::on_pushButton_clicked()
     ui->hour->display(hour);
     ui->min->display(min);
 
+}
+
+void Server::timeout()
+{
+    //系统时间加一秒
+    for(ClientBlock *client:_queue)
+    {
+        client->check();
+    }
+    schedule();
 }
