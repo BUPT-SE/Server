@@ -28,11 +28,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         server.cpp \
     clientblock.cpp \
-    attribute.cpp
+    attribute.cpp \
+    configdialog.cpp \
+    database.cpp
 
 HEADERS  += server.h \
     clientblock.h \
-    attribute.h
+    attribute.h \
+    configdialog.h \
+    database.h
 
 FORMS    += \
     server.ui
