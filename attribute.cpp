@@ -60,7 +60,7 @@ float Attribute::getKWh() const
     return _kWh;
 }
 
-float Attribute::getFee() const
+flaot Attribute::getFee() const
 {
     return _fee;
 }

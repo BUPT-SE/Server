@@ -1,7 +1,7 @@
 #ifndef CLIENTBLOCK_H
 #define CLIENTBLOCK_H
 
-#include <QTcpSocket>
+//#include <QTcpSocket>
 #include "attribute.h"
 
 class ClientBlock : public QObject
@@ -10,8 +10,8 @@ class ClientBlock : public QObject
 public slots:
     void readMessage();             //判断请求是否合理，包括目标温度当前温度是否合理，若接收到关机请求，则发送shutdown信号
 signals:
-    void shutdown(ClientBlock* );        //当接收到从控机的关机请求时，此信号用于通知Sever销毁自己
-    void update(QString roomNum);        //当收到消息时，触发此信号，主机面板上更新从机状态
+    shutdown(ClientBlock* );        //当接收到从控机的关机请求时，此信号用于通知Sever销毁自己
+    update(QString roomNum);        //当收到消息时，触发此信号，主机面板上更新从机状态
 public:
     explicit ClientBlock(QTcpSocket* socket, int mode, QObject *parent = 0);//根据socket和主机工作模式构造CB
     int getPriority();              //更新优先级，得到优先级
