@@ -1,6 +1,7 @@
 #include "server.h"
 #include "ui_server.h"
 #include "room.h"
+#include "database.h"
 #include <QTimer>
 #include <QDateTime>
 #include <QVector>
@@ -77,6 +78,7 @@ Server::Server(QWidget *parent) :
     ui->Room4->setEnabled(false);
 
     ui->configBox->setEnabled(true);
+
 }
 
 Server::~Server()
@@ -262,4 +264,38 @@ void Server::on_offButton_clicked()
     ui->day->setEnabled(false);
     ui->hour->setEnabled(false);
     ui->min->setEnabled(false);
+}
+
+void Server::on_paylist1_clicked()
+{
+    ui->output->setText(database::getInstance()->getBill(ui->id1->text().toInt()));
+}
+void Server::on_paylist2_clicked()
+{
+    ui->output->setText(database::getInstance()->getBill(ui->id2->text().toInt()));
+}
+void Server::on_paylist3_clicked()
+{
+    ui->output->setText(database::getInstance()->getBill(ui->id3->text().toInt()));
+}
+void Server::on_paylist4_clicked()
+{
+    ui->output->setText(database::getInstance()->getBill(ui->id4->text().toInt()));
+}
+
+void Server::on_detail1_clicked()
+{
+    ui->output->setText(database::getInstance()->getDetailBill(ui->id1->text().toInt()));
+}
+void Server::on_detail2_clicked()
+{
+    ui->output->setText(database::getInstance()->getDetailBill(ui->id2->text().toInt()));
+}
+void Server::on_detail3_clicked()
+{
+    ui->output->setText(database::getInstance()->getDetailBill(ui->id3->text().toInt()));
+}
+void Server::on_detail4_clicked()
+{
+    ui->output->setText(database::getInstance()->getDetailBill(ui->id4->text().toInt()));
 }

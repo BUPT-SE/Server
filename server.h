@@ -6,14 +6,16 @@
 #include <QTcpSocket>
 #include <QList>
 #include <QLabel>
-#include "clientblock.h"
 #include <QDateTime>
-#include "attribute.h"
 #include <Qtimer>
+#include "attribute.h"
+#include "clientblock.h"
 #include "room.h"
+#include "database.h"
+#include "configdialog.h"
 
 namespace Ui {
-class Server;
+    class Server;
 }
 
 class Server : public QWidget{
@@ -28,8 +30,6 @@ public:
     QTimer *timer = new QTimer(this);
     QDateTime Date=QDateTime::currentDateTime();
     QTime time=QTime::currentTime();
-
-
     Attribute attribute;
     QVector<room> rooms;
 private slots:
@@ -40,7 +40,14 @@ private slots:
     void on_onButton_clicked();
     void on_okButton_clicked();
     void on_offButton_clicked();
-
+    void on_paylist1_clicked();
+    void on_paylist2_clicked();
+    void on_paylist3_clicked();
+    void on_paylist4_clicked();
+    void on_detail1_clicked();
+    void on_detail2_clicked();
+    void on_detail3_clicked();
+    void on_detail4_clicked();
 public slots:
     void onTimeOut();
 private:
