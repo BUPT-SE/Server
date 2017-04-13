@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QDateTime>
 #include <QVector>
+#include "qmath.h"
 
 Server::Server(QWidget *parent) :
     QWidget(parent),
@@ -16,7 +17,7 @@ Server::Server(QWidget *parent) :
     ui->setupUi(this);
 
     //new server
-    _server=new QTcpServer();
+    _server = new QTcpServer();
     //监听所有的连接请求
     if(!_server->listen(QHostAddress::Any,666))
     {
@@ -272,7 +273,7 @@ void Server::onTimeOut()
     {
         client->check();
     }
-    //schedule();
+    schedule();
 }
 
 void Server::on_okButton_clicked()
@@ -281,6 +282,7 @@ void Server::on_okButton_clicked()
     ui->onButton->setEnabled(true);
     ui->offButton->setEnabled(true);
 }
+
 
 void Server::on_offButton_clicked()
 {
@@ -355,3 +357,44 @@ void Server::on_detail4_clicked()
 {
     ui->output->setText(database::getInstance()->getDetailBill(ui->id4->text().toInt()));
 }
+
+
+void Server::schedule(){//1.遍历queue把服务完成的从机放到队尾；2.调用qSort对服务未完成的从机排序（选前三），依据优先级
+    static int cnt = 10;
+    if(cnt == 0){
+        QList<ClientBlock*> queue_schedule,queue_satisfied;
+        for (int i = 0;i != _queue.size();i++){
+            if(_queue.at(i)->isSatisfied() == false)
+                queue_schedule.append(_queue.at(i));
+            else
+                queue_satisfied.append(_queue.at(i));
+        }
+        if(queue_schedule.size() > 4){
+            qsort(queue_schedule.begin(),queue_schedule.end(),compareSpeed);
+        }
+        for(int i = 0;i != qMin(4,queue_schedule.size());i++){
+            if(queue_schedule.at(i)->getAttribute().getIsServed() == false){
+                queue_schedule.at(i)->getAttribute().setIsServed(true);
+                queue_schedule.at(i)->sendMessage();
+            }
+        }
+        for(int i = 3;i < queue_schedule.size();i++){
+            if(queue_schedule.at(i)->getAttribute().getIsServed() == true){
+                queue_schedule.at(i)->getAttribute().setIsServed() == false;
+                queue_schedule.at(i)->sendMessage();
+            }
+        }
+        _queue.clear();
+        _queue = queue_schedule + queue_satisfied;
+        cnt = 10;
+    }else cnt --;
+    return;
+}
+
+bool Server::compareSpeed(const ClientBlock* x,const ClientBlock* y)
+{
+    if(x->getAttribute().getWindSpeed() > y->getAttribute().getWindSpeed()) return true;
+    return false;
+}
+
+
