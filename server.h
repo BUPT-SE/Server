@@ -16,8 +16,8 @@ class Server : public QWidget
 {
     Q_OBJECT
 public slots:
-    void newClient();//有从机建立连接请求时，建立TCP连接
-    void updateUI();//更新面板上各从机的状态
+    //void newClient();//有从机建立连接请求时，建立TCP连接
+    //void updateUI();//更新面板上各从机的状态
 public:
     explicit Server(QWidget *parent = 0);
     ~Server();
@@ -37,12 +37,14 @@ private slots:
     void on_check3_clicked();
     void on_check4_clicked();
     void on_pushButton_clicked();
-//public slots:
-   // QDateTime dateTime=QDateTime::currentDateTime();
+    void newConnection();
+    void disConnection(ClientBlock* clientBlock);
+    //public slots:
+    // QDateTime dateTime=QDateTime::currentDateTime();
     //int year=dateTim
 private:
     Ui::Server *ui;
-    QTcpServer _server;
+    QTcpServer *_server;
     QList<ClientBlock* > _queue;//存四个从控机，最多前三个是正在被服务，
 };
 

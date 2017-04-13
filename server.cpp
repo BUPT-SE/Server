@@ -6,6 +6,50 @@ Server::Server(QWidget *parent) :
     ui(new Ui::Server)
 {
     ui->setupUi(this);
+
+    //new server
+    this->_server=new QTcpServer();
+    //监听所有的连接请求
+    if(!_server->listen(QHostAddress::Any,666))
+    {
+        qDebug() <<"Contect Error";
+    }
+    else
+    {
+       qDebug() <<"Contect Succeed";
+
+    }
+
+    connect(_server,SIGNAL(newConnection()),this,SLOT(newConnection()));
+
+}
+
+void Server::newConnection()
+{
+    ClientBlock* newClientBlock=new ClientBlock(_server->nextPendingConnection(),0);
+    this->_queue.push_back(newClientBlock);
+    qDebug()<<"queue length";
+    connect(newClientBlock,SIGNAL(shutdown(ClientBlock*)),this,SLOT(disConnection(ClientBlock*)));
+}
+
+void Server::disConnection(ClientBlock* clientBlock)
+{
+
+    QList<ClientBlock*>::iterator it;
+    qDebug()<<"queue length"<<_queue.size()<<endl;
+    for(it=_queue.begin();it!=_queue.end();it++)
+    {
+
+        //如果找到了这个房间对应的block
+        if(*it==clientBlock)
+        {
+            _queue.erase(it);
+            break;
+        }
+
+    }
+    qDebug()<<"queue length"<<_queue.size()<<endl;
+    delete clientBlock;
 }
 
 Server::~Server()
