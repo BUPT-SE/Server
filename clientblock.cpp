@@ -29,19 +29,44 @@ void ClientBlock::check()
             else            //时机已到
             {
                 if(_attribute.getMode() == Attribute::MODE_COOL)
-                    _attribute.decRoomTmp();
+                    _attribute.decRoomTmp();            //降温
                 else
-                    _attribute.incRoomTmp();
+                    _attribute.incRoomTmp();            //升温
+
+                _tmpFee+=0.1;
+                _attribute.setFee(_attribute.getFee()+0.1);
+
                 if(_attribute.getTargetTmp() == _attribute.getRoomTmp())
                 {
                     _attribute.setIsServed(false);
-                    sendMessage();//满足要求，发送消息
                     _satisfied = true;
+
+                    //数据库存储
+
                     emit update(_attribute.getRoomNum());//更新客户端状态
                 }else{
                     updateCount();
                 }
+
+                sendMessage();//发送消息,更新温度和费用
+
             }
         }
+    }
+}
+
+void ClientBlock::updateCount()
+{
+    switch(_attribute.getWindSpeed())
+    {
+    case Attribute::SPD_LOW:
+        _count = 3*60/10.0;
+        break;
+    case Attribute::SPD_MID:
+        _count = 2*60/10;
+        break;
+    case Attribute::SPD_HIGH:
+        _count = 60/10;
+        break;
     }
 }

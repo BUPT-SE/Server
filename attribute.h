@@ -44,6 +44,10 @@ public:
 
     void setMode(int mode);
 
+    void setFee(double fee);
+
+    void setKWh(double kWh);
+
 private:
     QString _roomNum;                   //房间号
     int _windSpeed;                     //风速，低档，中档，高档
@@ -54,7 +58,7 @@ private:
     bool _isServed;                     //是否正在被服务
     double _defRoomTmp;                  //缺省室温，室温稳定值，构造函数中赋初值
     double _kWh;                         //消耗的电量
-    double _fee;                         //所需支付的费用
+    double _fee;                         //所需支付总的费用
     double _lowestTmp;                  //允许设置目标温度的最低温度
     double _highestTmp;                 //运行设置目标温度的最高温度
 

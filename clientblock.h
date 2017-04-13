@@ -26,9 +26,12 @@ private:
     void updateCount();             //count变为0时，或从机发送风速变化请求，需根据风速重新计算count
 private:
     Server * _server;
-    Attribute _attribute;           //从控机
+    Attribute _attribute;           //从控机，和从控机交互的一些属性
     QTcpSocket* _socket;            //套接字
+
+    //控制和数据库相关的信息
     int _count;                     //下次发送变温消息的计时器
+    double _tmpFee;                 //本次服务的费用
     int _suspended;                 //累计挂起的时间
     bool _satisfied;                //服务完成(达到目标温度)为true
 };

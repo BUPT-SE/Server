@@ -94,3 +94,13 @@ void Attribute::setMode(int mode)
 {
     _mode = mode;
 }
+
+void Attribute::setFee(double fee)
+{
+    _fee = fee;
+}
+
+void Attribute::setKWh(double kWh)
+{
+    _kWh = kWh;
+}
