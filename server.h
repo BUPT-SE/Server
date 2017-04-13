@@ -1,4 +1,4 @@
-﻿#ifndef SERVER_H
+#ifndef SERVER_H
 #define SERVER_H
 
 #include <QWidget>
@@ -23,9 +23,9 @@ class ClientBlock;
 class Server : public QWidget{
     Q_OBJECT
 public slots:
-
-    //void newClient();//有从机建立连接请求时，建立TCP连接
+    void onTimeOut();
     //void updateUI();//更新面板上各从机的状态
+  
 public:
     explicit Server(QWidget *parent = 0);
     ~Server();
@@ -33,6 +33,9 @@ public:
     Attribute attribute;
     QVector<room> rooms;
 private slots:
+    void newConnection();
+    void disConnection(ClientBlock* clientBlock);
+  
     void on_check1_clicked();
     void on_check2_clicked();
     void on_check3_clicked();
@@ -48,8 +51,7 @@ private slots:
     void on_detail2_clicked();
     void on_detail3_clicked();
     void on_detail4_clicked();
-public slots:
-    void onTimeOut();
+
 private:
     Ui::Server *ui;
     QTcpServer _server;
