@@ -7,7 +7,7 @@
 #include <QList>
 #include <QLabel>
 #include <QDateTime>
-#include <Qtimer>
+#include <QTimer>
 #include "attribute.h"
 #include "clientblock.h"
 #include "room.h"

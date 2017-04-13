@@ -26,9 +26,7 @@ public:
     void setRoomNum(const QString &roomNum);
     int getWindSpeed() const;
 
-    void Attribute::setWindSpeed(const QString &windSpeed);
-
-    void setWindSpeed(const int &windSpeed);
+    void setWindSpeed(const QString &windSpeed);
 
     int getMode() const;
 
