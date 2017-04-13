@@ -1,5 +1,16 @@
 #include "attribute.h"
 
+
+void Attribute::incRoomTmp()
+{
+    _roomTmp+=0.1;
+}
+
+void Attribute::decRoomTmp()
+{
+    _roomTmp-=0.1;
+}
+
 QString Attribute::getRoomNum() const
 {
     return _roomNum;
@@ -15,29 +26,20 @@ int Attribute::getWindSpeed() const
     return _windSpeed;
 }
 
-void Attribute::setWindSpeed(const int &windSpeed)
+void Attribute::setWindSpeed(const QString &windSpeed)
 {
-    _windSpeed = windSpeed;
+    if(windSpeed.operator ==("Low"))
+        _windSpeed=0;
+    else if(windSpeed.operator ==("Middle"))
+        _windSpeed=1;
+    else if(windSpeed.operator ==("High"))
+        _windSpeed=2;
 }
 
-float Attribute::getRoomTmp() const
-{
-    return _roomTmp;
-}
 
 int Attribute::getMode() const
 {
     return _mode;
-}
-
-float Attribute::getTargetTmp() const
-{
-    return _targetTmp;
-}
-
-void Attribute::setTargetTmp(float targetTmp)
-{
-    _targetTmp = targetTmp;
 }
 
 bool Attribute::getPower() const
@@ -55,12 +57,58 @@ bool Attribute::getIsServed() const
     return _isServed;
 }
 
-float Attribute::getKWh() const
+
+void Attribute::setIsServed(bool isServed)
 {
-    return _kWh;
+    _isServed = isServed;
 }
 
-float Attribute::getFee() const
+void Attribute::setLowestTmp(double lowestTmp)
+{
+    _lowestTmp = lowestTmp;
+}
+
+void Attribute::setHighestTmp(double highestTmp)
+{
+    _highestTmp = highestTmp;
+}
+
+void Attribute::setMode(int mode)
+{
+    _mode = mode;
+}
+
+void Attribute::setFee(double fee)
+{
+    _fee = fee;
+}
+
+void Attribute::setKWh(double kWh)
+{
+    _kWh = kWh;
+}
+
+double Attribute::getRoomTmp() const
+{
+    return _roomTmp;
+}
+
+void Attribute::setRoomTmp(double roomTmp)
+{
+    _roomTmp = roomTmp;
+}
+
+double Attribute::getTargetTmp() const
+{
+    return _targetTmp;
+}
+
+void Attribute::setTargetTmp(double targetTmp)
+{
+    _targetTmp = targetTmp;
+}
+
+double Attribute::getFee() const
 {
     return _fee;
 }

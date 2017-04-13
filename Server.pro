@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += network
+QT       += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,11 +28,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         server.cpp \
     clientblock.cpp \
-    attribute.cpp
+    attribute.cpp \
+    configdialog.cpp \
+    database.cpp
 
 HEADERS  += server.h \
     clientblock.h \
-    attribute.h
+    attribute.h \
+    room.h \
+    configdialog.h \
+    database.h
 
-FORMS    += \
-    server.ui
+FORMS    += server.ui
