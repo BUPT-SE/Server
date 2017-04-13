@@ -6,7 +6,8 @@
 #include <QTcpSocket>
 #include <QList>
 #include "clientblock.h"
-
+#include <QDateTime>
+#include <Qtimer>
 namespace Ui {
 class Server;
 }
@@ -21,10 +22,29 @@ public:
     explicit Server(QWidget *parent = 0);
     ~Server();
     void schedule();//1.遍历queue把服务完成的从机放到队尾；2.调用qSort对服务未完成的从机排序（选前三），依据优先级
+    QTime time = QTime::currentTime();
+    int hour=time.hour();
+    int min=time.minute();
+
+    QDateTime dateTime=QDateTime::currentDateTime();
+    int year=dateTime.date().year();
+    int month=dateTime.date().month();
+    int day=dateTime.date().day();
+
+private slots:
+    void on_check1_clicked();
+    void on_check2_clicked();
+    void on_check3_clicked();
+    void on_check4_clicked();
+    void on_pushButton_clicked();
+//public slots:
+   // QDateTime dateTime=QDateTime::currentDateTime();
+    //int year=dateTim
 private:
     Ui::Server *ui;
     QTcpServer _server;
     QList<ClientBlock* > _queue;//存四个从控机，最多前三个是正在被服务，
+    bool Server::compareSpeed(const ClientBlock* x,const ClientBlock* y);
 };
 
 #endif // SERVER_H

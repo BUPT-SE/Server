@@ -60,7 +60,11 @@ float Attribute::getKWh() const
     return _kWh;
 }
 
-flaot Attribute::getFee() const
+float Attribute::getFee() const
 {
     return _fee;
+}
+
+void Attribute::setIsServed(bool isServed){
+    _isServed = isServed;
 }

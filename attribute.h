@@ -7,11 +7,11 @@
 class Attribute
 {
 public:
-    static int SPD_LOW = 0;             //风速低档
-    static int SPD_MID = 1;             //风速中档
-    static int SPD_HIGH = 2;            //风速高档
-    static int MODE_COOL = 0;           //工作模式制冷
-    static int MODE_HEAT = 1;           //工作模式制热
+    //static int SPD_LOW = 0;             //风速低档
+    //static int SPD_MID = 1;             //风速中档
+    //static int SPD_HIGH = 2;            //风速高档
+    //static int MODE_COOL = 0;           //工作模式制冷
+    //static int MODE_HEAT = 1;           //工作模式制热
 
 public:
     Attribute();                        //构造函数
@@ -34,7 +34,8 @@ public:
     void setPower(bool power);
     bool getIsServed() const;
     float getKWh() const;
-    flaot getFee() const;
+    void setIsServed(bool isServed);
+    //float getFee() const;
 
 private:
     QString _roomNum;                   //房间号
@@ -46,7 +47,7 @@ private:
     bool _isServed;                     //是否正在被服务
     float _defRoomTmp;                  //缺省室温，室温稳定值，构造函数中赋初值
     float _kWh;                         //消耗的电量
-    flaot _fee;                         //所需支付的费用
+    //flaot _fee;                         //所需支付的费用
 };
 
 #endif // ATTRIBUTE_H
