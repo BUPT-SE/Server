@@ -29,29 +29,28 @@ void Attribute::setFromJson(QByteArray byteArray)
             {
                 QJsonValue windSpeed=json.take("windSpeed");
                 this->_windSpeed=windSpeed.toInt();
-                 qDebug() << _windSpeed;
+                qDebug() << _windSpeed;
             }
             if(json.contains("roomTmp"))
             {
                 QJsonValue roomTmp=json.take("roomTmp");
                 this->_roomTmp=roomTmp.toDouble();
-                 qDebug() << _roomTmp;
+                qDebug() << _roomTmp;
             }
             if(json.contains("targetTmp"))
             {
                 QJsonValue targetTmp=json.take("targetTmp");
                 this->_targetTmp=targetTmp.toDouble();
-                 qDebug() << _targetTmp;
+                qDebug() << _targetTmp;
             }
             if(json.contains("power"))
             {
                 QJsonValue power=json.take("power");
                 this->_power=power.toBool();
-                 qDebug() << _power;
+                qDebug() << _power;
             }
             else
                qDebug() << jsonError.error;
-
         }
     }
 }
@@ -67,7 +66,18 @@ QJsonObject Attribute::toJson()
     return json;
 }
 
-int Attribute::getRoomNum() const
+void Attribute::incRoomTmp()
+{
+    _roomTmp += 0.1;
+}
+
+void Attribute::decRoomTmp()
+{
+    _roomTmp -= 0.1;
+}
+
+QString Attribute::getRoomNum() const
+
 {
     return _roomNum;
 }
@@ -82,15 +92,11 @@ int Attribute::getWindSpeed() const
     return _windSpeed;
 }
 
-void Attribute::setWindSpeed(const int &windSpeed)
-{
-    _windSpeed = windSpeed;
-}
-
 double Attribute::getRoomTmp() const
 {
     return _roomTmp;
 }
+
 
 void Attribute::setMode(const int mode)
 {
@@ -127,10 +133,60 @@ bool Attribute::getIsServed() const
     return _isServed;
 }
 
-double Attribute::getKWh() const
+void Attribute::setKwh(double Kwh)
+{
+    _Kwh = Kwh;
+}
+
+double Attribute::getKwh() const
 {
     return _Kwh;
 }
+
+void Attribute::setIsServed(bool isServed)
+{
+    _isServed = isServed;
+}
+
+void Attribute::setLowestTmp(double lowestTmp)
+{
+    _lowestTmp = lowestTmp;
+}
+
+void Attribute::setHighestTmp(double highestTmp)
+{
+    _highestTmp = highestTmp;
+}
+
+void Attribute::setMode(int mode)
+{
+    _mode = mode;
+}
+
+void Attribute::setFee(double fee)
+{
+    _fee = fee;
+}
+
+double Attribute::getRoomTmp() const
+{
+    return _roomTmp;
+}
+
+void Attribute::setRoomTmp(double roomTmp)
+{
+    _roomTmp = roomTmp;
+}
+
+double Attribute::getTargetTmp() const
+{
+    return _targetTmp;
+}
+
+void Attribute::setTargetTmp(double targetTmp)
+{
+    _targetTmp = targetTmp;
+
 
 double Attribute::getFee() const
 {
