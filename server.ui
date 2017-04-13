@@ -7,8 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>855</width>
-    <height>636</height>
+    <height>581</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Widget</string>
@@ -34,137 +39,6 @@
     <string>中央空调控制系统</string>
    </property>
   </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>670</x>
-     <y>590</y>
-     <width>154</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="clock">
-    <item>
-     <widget class="QLCDNumber" name="hour"/>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_2">
-      <property name="font">
-       <font>
-        <family>楷体</family>
-        <pointsize>16</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLCDNumber" name="min"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>540</x>
-     <y>550</y>
-     <width>281</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="calendar">
-    <item>
-     <widget class="QLCDNumber" name="yeart"/>
-    </item>
-    <item>
-     <widget class="QLabel" name="year">
-      <property name="font">
-       <font>
-        <family>宋体</family>
-        <pointsize>14</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>年</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLCDNumber" name="montht"/>
-    </item>
-    <item>
-     <widget class="QLabel" name="month">
-      <property name="font">
-       <font>
-        <family>宋体</family>
-        <pointsize>14</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>月</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLCDNumber" name="dayt"/>
-    </item>
-    <item>
-     <widget class="QLabel" name="day">
-      <property name="font">
-       <font>
-        <family>宋体</family>
-        <pointsize>14</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>日</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_3">
-   <property name="geometry">
-    <rect>
-     <x>450</x>
-     <y>10</y>
-     <width>182</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="list">
-    <item>
-     <widget class="QLabel" name="label_3">
-      <property name="font">
-       <font>
-        <family>Adobe Arabic</family>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>调度队列长度：</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="listt">
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
@@ -184,7 +58,7 @@
        <enum>QFormLayout::DontWrapRows</enum>
       </property>
       <item row="0" column="0">
-       <widget class="QLabel" name="ID1">
+       <widget class="QLabel" name="id1Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -197,7 +71,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="IDt1">
+       <widget class="QLabel" name="id1">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -213,7 +87,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="roomnum1">
+       <widget class="QLabel" name="roomNum1Lable">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -226,7 +100,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="roomnumt1">
+       <widget class="QLabel" name="roomNum1">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -242,7 +116,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="goal1">
+       <widget class="QLabel" name="targetTmp1Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -255,7 +129,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="goalt1">
+       <widget class="QLabel" name="targetTmp1">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -271,7 +145,7 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QLabel" name="curtem1">
+       <widget class="QLabel" name="roomTmp1Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -284,7 +158,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLabel" name="curtemt1">
+       <widget class="QLabel" name="roomTmp1">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -300,7 +174,7 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QLabel" name="speed1">
+       <widget class="QLabel" name="windSpeed1Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -313,7 +187,7 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QLabel" name="speedt1">
+       <widget class="QLabel" name="windSpeed1">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -329,7 +203,7 @@
        </widget>
       </item>
       <item row="5" column="0">
-       <widget class="QLabel" name="curstate1">
+       <widget class="QLabel" name="status1Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -342,7 +216,7 @@
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="QLabel" name="curstatet1">
+       <widget class="QLabel" name="status1">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -358,7 +232,7 @@
        </widget>
       </item>
       <item row="6" column="0">
-       <widget class="QLabel" name="consum1">
+       <widget class="QLabel" name="Kwh1Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -371,7 +245,7 @@
        </widget>
       </item>
       <item row="6" column="1">
-       <widget class="QLabel" name="consumt1">
+       <widget class="QLabel" name="Kwh1">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -387,7 +261,7 @@
        </widget>
       </item>
       <item row="7" column="0">
-       <widget class="QLabel" name="pay1">
+       <widget class="QLabel" name="fee1Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -400,7 +274,7 @@
        </widget>
       </item>
       <item row="7" column="1">
-       <widget class="QLabel" name="payt1">
+       <widget class="QLabel" name="fee1">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -434,7 +308,7 @@
     <item>
      <widget class="QPushButton" name="check1">
       <property name="text">
-       <string>CHECK IN</string>
+       <string>Check in</string>
       </property>
      </widget>
     </item>
@@ -459,7 +333,7 @@
        <enum>QFormLayout::DontWrapRows</enum>
       </property>
       <item row="0" column="0">
-       <widget class="QLabel" name="ID2">
+       <widget class="QLabel" name="id2Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -472,7 +346,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="IDt2">
+       <widget class="QLabel" name="id2">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -488,7 +362,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="roomnum2">
+       <widget class="QLabel" name="roomNum2Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -501,7 +375,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="roomnumt2">
+       <widget class="QLabel" name="roomNum2">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -517,7 +391,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="goal2">
+       <widget class="QLabel" name="targetTmp2Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -530,7 +404,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="goalt2">
+       <widget class="QLabel" name="targetTmp2">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -546,7 +420,7 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QLabel" name="curtem2">
+       <widget class="QLabel" name="roomTmp2Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -559,7 +433,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLabel" name="curtemt2">
+       <widget class="QLabel" name="roomTmp2">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -575,7 +449,7 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QLabel" name="speed2">
+       <widget class="QLabel" name="windSpeed2Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -588,7 +462,7 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QLabel" name="speedt2">
+       <widget class="QLabel" name="windSpeed2">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -604,7 +478,7 @@
        </widget>
       </item>
       <item row="5" column="0">
-       <widget class="QLabel" name="curstate2">
+       <widget class="QLabel" name="status2Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -617,7 +491,7 @@
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="QLabel" name="curstatet2">
+       <widget class="QLabel" name="status2">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -633,7 +507,7 @@
        </widget>
       </item>
       <item row="6" column="0">
-       <widget class="QLabel" name="consum2">
+       <widget class="QLabel" name="Kwh2Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -646,7 +520,7 @@
        </widget>
       </item>
       <item row="6" column="1">
-       <widget class="QLabel" name="consumt2">
+       <widget class="QLabel" name="Kwh2">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -662,7 +536,7 @@
        </widget>
       </item>
       <item row="7" column="0">
-       <widget class="QLabel" name="pay2">
+       <widget class="QLabel" name="fee2Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -675,7 +549,7 @@
        </widget>
       </item>
       <item row="7" column="1">
-       <widget class="QLabel" name="payt2">
+       <widget class="QLabel" name="fee2">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -709,7 +583,7 @@
     <item>
      <widget class="QPushButton" name="check2">
       <property name="text">
-       <string>CHECK IN</string>
+       <string>Check in</string>
       </property>
      </widget>
     </item>
@@ -719,9 +593,9 @@
    <property name="geometry">
     <rect>
      <x>410</x>
-     <y>310</y>
+     <y>320</y>
      <width>191</width>
-     <height>238</height>
+     <height>232</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="room3">
@@ -734,7 +608,7 @@
        <enum>QFormLayout::DontWrapRows</enum>
       </property>
       <item row="0" column="0">
-       <widget class="QLabel" name="ID3">
+       <widget class="QLabel" name="id3Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -747,7 +621,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="roomnum3">
+       <widget class="QLabel" name="roomNum3Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -760,7 +634,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="roomnumt3">
+       <widget class="QLabel" name="roomNum3">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -776,7 +650,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="goal3">
+       <widget class="QLabel" name="targetTmp3Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -789,7 +663,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="goalt3">
+       <widget class="QLabel" name="targetTmp3">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -805,7 +679,7 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QLabel" name="curtem3">
+       <widget class="QLabel" name="roomTmp3Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -818,7 +692,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLabel" name="curtemt3">
+       <widget class="QLabel" name="roomTmp3">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -834,7 +708,7 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QLabel" name="speed3">
+       <widget class="QLabel" name="windSpeed3Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -847,7 +721,7 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QLabel" name="speedt3">
+       <widget class="QLabel" name="windSpeed3">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -863,7 +737,7 @@
        </widget>
       </item>
       <item row="5" column="0">
-       <widget class="QLabel" name="curstate3">
+       <widget class="QLabel" name="status3Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -876,7 +750,7 @@
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="QLabel" name="curstatet3">
+       <widget class="QLabel" name="status3">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -892,7 +766,7 @@
        </widget>
       </item>
       <item row="6" column="0">
-       <widget class="QLabel" name="consum3">
+       <widget class="QLabel" name="Kwh3Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -919,7 +793,7 @@
        </widget>
       </item>
       <item row="7" column="0">
-       <widget class="QLabel" name="pay3">
+       <widget class="QLabel" name="fee3Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -932,7 +806,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="IDt3">
+       <widget class="QLabel" name="id3">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -948,7 +822,7 @@
        </widget>
       </item>
       <item row="6" column="1">
-       <widget class="QLabel" name="consumt3">
+       <widget class="QLabel" name="Kwh3">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -964,7 +838,7 @@
        </widget>
       </item>
       <item row="7" column="1">
-       <widget class="QLabel" name="payt3">
+       <widget class="QLabel" name="fee3">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -984,7 +858,7 @@
     <item>
      <widget class="QPushButton" name="check3">
       <property name="text">
-       <string>CHECK IN</string>
+       <string>Check in</string>
       </property>
      </widget>
     </item>
@@ -994,9 +868,9 @@
    <property name="geometry">
     <rect>
      <x>640</x>
-     <y>310</y>
+     <y>320</y>
      <width>191</width>
-     <height>238</height>
+     <height>232</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="room4">
@@ -1009,7 +883,7 @@
        <enum>QFormLayout::DontWrapRows</enum>
       </property>
       <item row="1" column="0">
-       <widget class="QLabel" name="roomnum4">
+       <widget class="QLabel" name="roomNum4Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -1022,7 +896,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="roomnumt4">
+       <widget class="QLabel" name="roomNum4">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -1038,7 +912,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="goal4">
+       <widget class="QLabel" name="targetTmp4Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -1051,7 +925,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="goalt4">
+       <widget class="QLabel" name="targetTmp4">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -1067,7 +941,7 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QLabel" name="curtem4">
+       <widget class="QLabel" name="roomTmp4Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -1080,7 +954,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLabel" name="curtemt4">
+       <widget class="QLabel" name="roomTmp4">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -1096,7 +970,7 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QLabel" name="speed4">
+       <widget class="QLabel" name="windSpeed4Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -1109,7 +983,7 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QLabel" name="speedt4">
+       <widget class="QLabel" name="windSpeed4">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -1125,7 +999,7 @@
        </widget>
       </item>
       <item row="5" column="0">
-       <widget class="QLabel" name="curstate4">
+       <widget class="QLabel" name="status4Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -1138,7 +1012,7 @@
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="QLabel" name="curstatet4">
+       <widget class="QLabel" name="status4">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -1168,7 +1042,7 @@
        </widget>
       </item>
       <item row="6" column="0">
-       <widget class="QLabel" name="consum4">
+       <widget class="QLabel" name="Kwh4Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -1181,7 +1055,7 @@
        </widget>
       </item>
       <item row="7" column="0">
-       <widget class="QLabel" name="pay4">
+       <widget class="QLabel" name="fee4Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -1194,7 +1068,7 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="ID4">
+       <widget class="QLabel" name="id4Label">
         <property name="font">
          <font>
           <family>Adobe Arabic</family>
@@ -1207,7 +1081,7 @@
        </widget>
       </item>
       <item row="6" column="1">
-       <widget class="QLabel" name="consumt4">
+       <widget class="QLabel" name="Kwh4">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -1223,7 +1097,7 @@
        </widget>
       </item>
       <item row="7" column="1">
-       <widget class="QLabel" name="payt4">
+       <widget class="QLabel" name="fee4">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -1239,7 +1113,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="IDt4">
+       <widget class="QLabel" name="id4">
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -1259,206 +1133,384 @@
     <item>
      <widget class="QPushButton" name="check4">
       <property name="text">
-       <string>CHECK IN</string>
+       <string>Check in</string>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QTextBrowser" name="textBrowser">
+  <widget class="QTextBrowser" name="output">
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>390</y>
-     <width>341</width>
-     <height>151</height>
+     <y>250</y>
+     <width>351</width>
+     <height>311</height>
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="onButton">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>70</y>
-     <width>111</width>
-     <height>51</height>
+     <x>60</x>
+     <y>60</y>
+     <width>91</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>开机</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="offButton">
    <property name="geometry">
     <rect>
-     <x>220</x>
-     <y>70</y>
-     <width>111</width>
-     <height>51</height>
+     <x>190</x>
+     <y>60</y>
+     <width>91</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>关机</string>
    </property>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget_5">
+  <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>150</y>
-     <width>341</width>
-     <height>231</height>
+     <x>340</x>
+     <y>10</y>
+     <width>507</width>
+     <height>31</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QGridLayout" name="default2">
-      <item row="5" column="4">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="3">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>房间号</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="3">
-       <widget class="QLabel" name="r3">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="3">
-       <widget class="QLabel" name="r2">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="5">
-       <widget class="QLabel" name="s1">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="5">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>风速</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="3">
-       <widget class="QLabel" name="r1">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="6">
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="6">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>目标温度</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="4">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>室温</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="3">
-       <widget class="QLabel" name="r4">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="4">
-       <widget class="QLabel" name="label_15">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="4">
-       <widget class="QLabel" name="label_16">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="4">
-       <widget class="QLabel" name="label_17">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="5">
-       <widget class="QLabel" name="s2">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="5">
-       <widget class="QLabel" name="s3">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="5">
-       <widget class="QLabel" name="s4">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="6">
-       <widget class="QLabel" name="label_21">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="6">
-       <widget class="QLabel" name="label_22">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="6">
-       <widget class="QLabel" name="label_23">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QLCDNumber" name="year">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_10">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>年</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLCDNumber" name="month">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_12">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>月</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLCDNumber" name="day">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_13">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>日</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLCDNumber" name="hour">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_14">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLCDNumber" name="min">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_15">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLCDNumber" name="sec">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+     </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QGroupBox" name="configBox">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>120</y>
+     <width>341</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Adobe Arabic</family>
+     <pointsize>13</pointsize>
+    </font>
+   </property>
+   <property name="title">
+    <string>配置区</string>
+   </property>
+   <widget class="QLabel" name="modeLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>13</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>模式选择</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="coolRadio">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>53</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>制冷</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="heatRadio">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>80</y>
+      <width>53</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>制热</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="tmpRangeLabel">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>20</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>13</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>温度范围</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="targetTmpEdit">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>50</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>25</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="targetTmpLabel">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>20</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>13</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>目标温度</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="highestTmpEdit">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>50</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>35</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lowestTmpEdit">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>80</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>10</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="highestTmpLabel">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>50</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>最高温度</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lowestTmpLabel">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>80</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>最低温度</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="okButton">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>80</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>确认</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
