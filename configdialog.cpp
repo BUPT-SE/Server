@@ -1,9 +1,9 @@
-#include "configdialog.h"
+﻿#include "configdialog.h"
 
 ConfigDialog::ConfigDialog(QWidget* parent) : QDialog(parent)
 {
     //三个标签和对应的输入框
-    QLabel* loginLabel = new QLabel(QString::fromLocal8Bit("请登陆数据库"));
+    QLabel* loginLabel = new QLabel(QString::fromLocal8Bit("请登录数据库"));
     QLabel* userNameLabel = new QLabel(QString::fromLocal8Bit("请输入用户名:"));
     QLabel* passwordLabel = new QLabel(QString::fromLocal8Bit("请输入密码:"));
     QLabel* hostNameLabel = new QLabel(QString::fromLocal8Bit("请输入主机地址:"));

@@ -1,4 +1,4 @@
-#include "server.h"
+﻿#include "server.h"
 #include "ui_server.h"
 #include "room.h"
 #include "database.h"
@@ -76,7 +76,6 @@ Server::Server(QWidget *parent) :
     ui->Room2->setEnabled(false);
     ui->Room3->setEnabled(false);
     ui->Room4->setEnabled(false);
-
     ui->configBox->setEnabled(true);
 
 }
