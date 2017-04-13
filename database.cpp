@@ -1,4 +1,4 @@
-﻿#include "database.h"
+#include "database.h"
 
 database::database()
 {
@@ -107,10 +107,10 @@ QString database::getBill(int customerId)
     query.exec();
 
     query.first();
-    QString result = QString::fromLocal8Bit("客户:") + QString::number(customerId) + "\n"
-            +QString::fromLocal8Bit("入住时间:") + checkinTime.toString("yyyy-MM-dd hh:mm:ss")
-            + "\n" +QString::fromLocal8Bit("退房时间:") + checkoutTime.toString("yyyy-MM-dd hh:mm:ss") + "\n"
-            + QString::fromLocal8Bit("总消费:") + QString::number(query.value(0).toDouble()) + QString::fromLocal8Bit("元");
+    QString result = "客户：" + QString::number(customerId) + "\n" +
+            "入住时间：" + checkinTime.toString("yyyy-MM-dd hh:mm:ss") + "\n" +
+            "退房时间：" + checkoutTime.toString("yyyy-MM-dd hh:mm:ss") + "\n" +
+            "总消费：" + QString::number(query.value(0).toDouble()) + "元";
 
     return result;
 }
@@ -129,10 +129,10 @@ QString database::getDetailBill(int customerId)
     querycheck.last();
     QDateTime checkoutTime = querycheck.value(0).toDateTime();
 
-    QString result = QString::fromLocal8Bit("客户:") + QString::number(customerId) + "\n" +
-            QString::fromLocal8Bit("入住时间:") + checkinTime.toString("yyyy-MM-dd hh:mm:ss") + "\n" +
-            QString::fromLocal8Bit("退房时间:") + checkoutTime.toString("yyyy-MM-dd hh:mm:ss") + "\n" +
-            QString::fromLocal8Bit("详细计费信息如下:") + "\n";
+    QString result = "客户：" + QString::number(customerId) + "\n" +
+            "入住时间：" + checkinTime.toString("yyyy-MM-dd hh:mm:ss") + "\n" +
+            "退房时间：" + checkoutTime.toString("yyyy-MM-dd hh:mm:ss") + "\n" +
+            "详细计费信息如下：" + "\n";
 
     //查询开机及关机时间
     QSqlQuery querypower;
@@ -148,7 +148,7 @@ QString database::getDetailBill(int customerId)
         querypower.next();
         QDateTime poweroffTime = querypower.value(0).toDateTime();
 
-        result += QString::fromLocal8Bit("在 ") + poweronTime.toString("yyyy-MM-dd hh:mm:ss") + QString::fromLocal8Bit(" 开机") + "\n";
+        result += "在 " + poweronTime.toString("yyyy-MM-dd hh:mm:ss") + " 开机" + "\n";
 
         subquery.prepare("SELECT * FROM service_record "
                          "WHERE customer_id = :customer_id AND "
