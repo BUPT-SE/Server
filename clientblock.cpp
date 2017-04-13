@@ -1,3 +1,4 @@
+﻿#include "attribute.h"
 #include "clientblock.h"
 
 
@@ -10,6 +11,11 @@ ClientBlock::ClientBlock(QTcpSocket *socket, double lowestTmp, double highestTmp
     _attribute.setTargetTmp(targetTmp);
     _server=server;
     _attribute.setMode(mode);
+    _suspended = 0;
+    _count = 0;
+    _tmpFee = 0;
+    _suspended = 0;
+    _satisfied = false;
 }
 
 
@@ -41,6 +47,7 @@ void ClientBlock::check()
                     _attribute.setIsServed(false);
                     _satisfied = true;
 
+
                     //数据库存储
 
                     emit update(_attribute.getRoomNum());//更新客户端状态
@@ -48,9 +55,11 @@ void ClientBlock::check()
                     updateCount();
                 }
 
-                sendMessage();//发送消息,更新温度和费用
+                //sendMessage();//发送消息,更新温度和费用
 
             }
+        }else{//挂起
+            _suspended++;//记录挂起时间
         }
     }
 }
@@ -69,4 +78,9 @@ void ClientBlock::updateCount()
         _count = 60/10;
         break;
     }
+}
+
+Attribute ClientBlock::getAttribute(){
+    return _attribute;
+
 }

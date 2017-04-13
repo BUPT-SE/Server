@@ -1,4 +1,4 @@
-#ifndef ATTRIBUTE_H
+﻿#ifndef ATTRIBUTE_H
 #define ATTRIBUTE_H
 
 #include <QJsonObject>
@@ -14,8 +14,8 @@ public:
     static const int MODE_HEAT = 1;           //工作模式制热
 
 public:
-    Attribute();                        //构造函数
-    ~Attribute();                       //析构函数
+    //Attribute();                        //构造函数
+    //~Attribute();                       //析构函数
     QJsonObject toJson();               //把属性转化成Json格式
     void setFromJson();                 //从Json格式改变属性值
     void incRoomTmp();                  //室温升0.1度
@@ -25,16 +25,20 @@ public:
     QString getRoomNum() const;
     void setRoomNum(const QString &roomNum);
     int getWindSpeed() const;
+
+    void Attribute::setWindSpeed(const QString &windSpeed);
+
     void setWindSpeed(const int &windSpeed);
-    double getRoomTmp() const;
+
     int getMode() const;
-    double getTargetTmp() const;
-    void setTargetTmp(float targetTmp);
+
     bool getPower() const;
+
     void setPower(bool power);
+
     bool getIsServed() const;
+
     double getKWh() const;
-    double getFee() const;
 
     void setIsServed(bool isServed);
     
@@ -47,6 +51,14 @@ public:
     void setFee(double fee);
 
     void setKWh(double kWh);
+
+    double getRoomTmp() const;
+    void setRoomTmp(double roomTmp);
+
+    double getTargetTmp() const;
+    void setTargetTmp(double targetTmp);
+
+    double getFee() const;
 
 private:
     QString _roomNum;                   //房间号
@@ -61,7 +73,6 @@ private:
     double _fee;                         //所需支付总的费用
     double _lowestTmp;                  //允许设置目标温度的最低温度
     double _highestTmp;                 //运行设置目标温度的最高温度
-
 };
 
 #endif // ATTRIBUTE_H
