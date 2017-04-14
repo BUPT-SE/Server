@@ -7,7 +7,6 @@
 #include "room.h"
 #include "database.h"
 
-
 Server::Server(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Server),
@@ -20,6 +19,7 @@ Server::Server(QWidget *parent) :
     //初始化tcpServer监听所有的连接请求
     _tcpServer = new QTcpServer();
     if(!_tcpServer->listen(QHostAddress::LocalHost, 666))
+
     {
         qDebug() <<"Contect Error";
     }
@@ -292,6 +292,7 @@ void Server::on_okButton_clicked()
     ui->offButton->setEnabled(true);
 }
 
+
 void Server::on_offButton_clicked()
 {
     ui->paylist1->setEnabled(false);
@@ -384,6 +385,7 @@ void Server::schedule(){//1.遍历queue把服务完成的从机放到队尾；2.
             else
                 queue_satisfied.append(_queue.at(i));
         }
+
         qDebug() << "queue length:" << queue_schedule.size();
         for (int i = 0; i != queue_schedule.size(); i++)
         {
@@ -436,5 +438,3 @@ void Server::sortByWindSpeed(QList<ClientBlock*> &queue)
                 queue[j + 1] = temp;
             }
 }
-
-

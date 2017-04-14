@@ -1,4 +1,4 @@
-﻿#include "clientblock.h"
+#include "clientblock.h"
 #include <QDebug>
 
 ClientBlock::ClientBlock(QTcpSocket *socket, double lowestTmp, double highestTmp,double targetTmp, int mode, Server *server, QObject *parent)

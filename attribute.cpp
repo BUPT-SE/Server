@@ -178,3 +178,7 @@ double Attribute::getFee() const
 {
     return _fee;
 }
+
+void Attribute::setIsServed(bool isServed){
+    _isServed = isServed;
+}

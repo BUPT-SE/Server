@@ -60,7 +60,9 @@ private:
     QTimer *timer;
     int t,Year,Month,Day,Hour,Min,nextClientID;
     int clientID[4];
+
     void sortByWindSpeed(QList<ClientBlock*> &queue);
     bool compareSpeed(ClientBlock *x, ClientBlock *y);
+
 };
 #endif // SERVER_H
