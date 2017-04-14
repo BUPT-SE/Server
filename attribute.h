@@ -44,7 +44,6 @@ public:
     void setKwh(const double Kwh);
     double getKwh() const;
 
-
 private:
     int _roomNum;                       //房间号
     int _windSpeed;                     //风速，低档，中档，高档

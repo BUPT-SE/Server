@@ -1,4 +1,4 @@
-#include "clientblock.h"
+﻿#include "clientblock.h"
 #include <QDebug>
 
 ClientBlock::ClientBlock(QTcpSocket *socket, double lowestTmp, double highestTmp,double targetTmp, int mode, Server *server, QObject *parent)
@@ -91,8 +91,8 @@ void ClientBlock::readMessage()
                 if(power.toBool() == true && _attribute->getPower() == false)
                 {
                     sendFirstMessage();
-                    updateCount();
                     _attribute->setFromJson(byteArray);
+                    updateCount();
                 }
                 //如果从机关机
                 else if(power.toBool()==false && _attribute->getPower()==true)
@@ -100,6 +100,7 @@ void ClientBlock::readMessage()
                     qDebug()<<"Client shut down!";
                     _socket->disconnectFromHost();
                     emit shutdown(this);
+                    return ;
                 }
             }
             if(json.contains("windSpeed"))
@@ -118,10 +119,11 @@ void ClientBlock::readMessage()
                 QJsonValue targetTmp = json.take("targetTmp");
                 QJsonValue roomTmp = json.take("roomTmp");
                 //服务完成后室温变化超过1度则重新进行温控请求
-                if(_satisfied == true && qAbs(targetTmp.toDouble() - roomTmp.toDouble()) > 1)
+                if(_satisfied == true && qAbs(targetTmp.toDouble() - roomTmp.toDouble()) >= 1)
                 {
                     _satisfied = false;
                     _attribute->setFromJson(byteArray);
+                    _attribute->setIsServed(false);
                     //更新count
                     updateCount();
                 }
@@ -138,24 +140,7 @@ void ClientBlock::readMessage()
  */
 void ClientBlock::check()
 {
-    //若当前为制冷模式且目标温度高于室温，则停止服务
-    if(_attribute->getMode() == Attribute::MODE_COOL
-       && _attribute->getTargetTmp() > _attribute->getRoomTmp())
-    {
-        _satisfied = true;
-        _attribute->setIsServed(false);
-        sendMessage();//发送消息,更新温度和费用
-    }
-    //若当前为制热模式且室温高于目标温度，则停止服务
-    else if(_attribute->getMode() == Attribute::MODE_HEAT
-            && _attribute->getRoomTmp() > _attribute->getTargetTmp())
-    {
-        _satisfied = true;
-        _attribute->setIsServed(false);
-        sendMessage();//发送消息,更新温度和费用
-    }
-
-    else if(!_satisfied)
+    if(!_satisfied)
     {
         if(_attribute->getIsServed())//服务中
         {
@@ -174,11 +159,26 @@ void ClientBlock::check()
                 _attribute->setFee(_attribute->getFee() + 0.1);
                 _attribute->setKwh(_attribute->getKwh() + 0.1);
 
-                if(qAbs(_attribute->getTargetTmp() - _attribute->getRoomTmp()) < 0.1)
+                //若当前为制冷模式且目标温度高于室温，则停止服务
+                if(_attribute->getMode() == Attribute::MODE_COOL
+                   && _attribute->getTargetTmp() > _attribute->getRoomTmp())
                 {
-                    _attribute->setIsServed(false);
                     _satisfied = true;
+                    _attribute->setIsServed(false);
+                    sendMessage();//发送消息,更新温度和费用
 
+                    //数据库存储
+
+                    //发送信号，更新客户端状态
+                    emit update(_attribute->getRoomNum());
+                }
+                //若当前为制热模式且室温高于目标温度，则停止服务
+                else if(_attribute->getMode() == Attribute::MODE_HEAT
+                        && _attribute->getRoomTmp() > _attribute->getTargetTmp())
+                {
+                    _satisfied = true;
+                    _attribute->setIsServed(false);
+                    sendMessage();//发送消息,更新温度和费用
 
                     //数据库存储
 
