@@ -1,4 +1,4 @@
-#ifndef SERVER_H
+﻿#ifndef SERVER_H
 #define SERVER_H
 
 #include <QWidget>
@@ -32,6 +32,7 @@ public:
     void schedule();//1.遍历queue把服务完成的从机放到队尾；2.调用qSort对服务未完成的从机排序（选前三），依据优先级
     Attribute attribute;
     QVector<room> rooms;
+
 private slots:
     void newConnection();
     void disConnection(ClientBlock* clientBlock);
@@ -54,11 +55,14 @@ private slots:
 
 private:
     Ui::Server *ui;
-    QTcpServer *_server;
+    QTcpServer *_tcpServer;
     QList<ClientBlock *> _queue;//存四个从控机，最多前三个是正在被服务
     QTimer *timer;
     int t,Year,Month,Day,Hour,Min,nextClientID;
     int clientID[4];
-    bool compareSpeed(const ClientBlock* x,const ClientBlock* y);
+
+    void sortByWindSpeed(QList<ClientBlock*> &queue);
+    bool compareSpeed(ClientBlock *x, ClientBlock *y);
+
 };
 #endif // SERVER_H

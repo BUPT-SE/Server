@@ -1,25 +1,25 @@
+﻿#include <QTimer>
+#include <QDateTime>
+#include <QVector>
+#include <QtAlgorithms>
 #include "server.h"
 #include "ui_server.h"
 #include "room.h"
 #include "database.h"
-#include <QTimer>
-#include <QDateTime>
-#include <QVector>
-#include "qmath.h"
 
 Server::Server(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Server),
     timer(new QTimer())
 {
-    t=0;
-    nextClientID=1;
+    t = 0;
+    nextClientID = 1;
     ui->setupUi(this);
 
-    //new server
-    _server = new QTcpServer();
-    //监听所有的连接请求
-    if(!_server->listen(QHostAddress::Any,666))
+    //初始化tcpServer监听所有的连接请求
+    _tcpServer = new QTcpServer();
+    if(!_tcpServer->listen(QHostAddress::LocalHost, 666))
+
     {
         qDebug() <<"Contect Error";
     }
@@ -27,7 +27,7 @@ Server::Server(QWidget *parent) :
     {
        qDebug() <<"Contect Succeed";
     }
-    connect(_server,SIGNAL(newConnection()),this,SLOT(newConnection()));
+    connect(_tcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 
     room room1,room2,room3,room4;
     room1.id=ui->id1;
@@ -93,7 +93,9 @@ Server::Server(QWidget *parent) :
     ui->Room3->setEnabled(false);
     ui->Room4->setEnabled(false);
     ui->configBox->setEnabled(true);
-    connect(timer,SIGNAL(timeout()),this,SLOT(onTimeOut()));
+
+    //连接定时器和槽
+    connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
 }
 
 Server::~Server()
@@ -103,9 +105,22 @@ Server::~Server()
 
 void Server::newConnection()
 {
-    ClientBlock* newClientBlock=new ClientBlock(_server->nextPendingConnection(),0);
+    //判断主机工作模式
+    int mode;
+    if(ui->coolRadio->isChecked())
+        mode = 0;
+    else if(ui->heatRadio->isChecked())
+        mode = 1;
+
+    //新建一个ClientBlock并压入队列
+    ClientBlock* newClientBlock = new ClientBlock(_tcpServer->nextPendingConnection(),
+                                                  ui->lowestTmpEdit->text().toDouble(),
+                                                  ui->highestTmpEdit->text().toDouble(),
+                                                  ui->targetTmpEdit->text().toDouble(),
+                                                  mode, this, 0);
     this->_queue.push_back(newClientBlock);
-    qDebug()<<"queue length";
+
+    //连接信号和槽
     connect(newClientBlock,SIGNAL(shutdown(ClientBlock*)),this,SLOT(disConnection(ClientBlock*)));
 }
 
@@ -113,25 +128,22 @@ void Server::disConnection(ClientBlock* clientBlock)
 {
 
     QList<ClientBlock*>::iterator it;
-    qDebug()<<"queue length"<<_queue.size()<<endl;
+    qDebug() << "queue length" << _queue.size()<<endl;
     for(it=_queue.begin();it!=_queue.end();it++)
     {
-
         //如果找到了这个房间对应的block
         if(*it==clientBlock)
         {
             _queue.erase(it);
             break;
         }
-
     }
-    qDebug()<<"queue length"<<_queue.size()<<endl;
+    qDebug() << "queue length" << _queue.size()<<endl;
     delete clientBlock;
 }
 
 void Server::on_check1_clicked()
 {
-
     if(ui->check1->text()=="Check in"){
         clientID[0]=nextClientID;
         nextClientID++;
@@ -167,14 +179,13 @@ void Server::on_check2_clicked()
         rooms[1].fee->setText("0");
         ui->check2->setText("Check out");
     }
-
     else{
         ui->paylist2->setEnabled(true);
         ui->detail2->setEnabled(true);
         ui->check2->setText("Check in");
     }
-
 }
+
 void Server::on_check3_clicked()
 {
     if(ui->check3->text()=="Check in"){
@@ -189,14 +200,12 @@ void Server::on_check3_clicked()
         rooms[2].fee->setText("0");
         ui->check3->setText("Check out");
     }
-
     else{
         ui->paylist3->setEnabled(true);
         ui->detail3->setEnabled(true);
         ui->check3->setText("Check in");
     }
 }
-
 
 void Server::on_check4_clicked()
 {
@@ -213,7 +222,6 @@ void Server::on_check4_clicked()
 
         ui->check4->setText("Check out");
     }
-
     else{
         ui->paylist4->setEnabled(true);
         ui->detail4->setEnabled(true);
@@ -269,7 +277,8 @@ void Server::onTimeOut()
     ui->hour->display(Hour);
     ui->min->display(Min);
 
-    for(ClientBlock *client:_queue)
+    qDebug() << "time out!";
+    for(ClientBlock *client : _queue)
     {
         client->check();
     }
@@ -299,7 +308,7 @@ void Server::on_offButton_clicked()
     ui->check2->setEnabled(false);
     ui->check3->setEnabled(false);
     ui->check4->setEnabled(false);
-   //房间监控清空
+    //房间监控清空
     for(int i=0;i<4;i++){
         rooms[i].id->clear();
         rooms[i].roomNum->clear();
@@ -328,14 +337,17 @@ void Server::on_paylist1_clicked()
 {
     ui->output->setText(database::getInstance()->getBill(ui->id1->text().toInt()));
 }
+
 void Server::on_paylist2_clicked()
 {
     ui->output->setText(database::getInstance()->getBill(ui->id2->text().toInt()));
 }
+
 void Server::on_paylist3_clicked()
 {
     ui->output->setText(database::getInstance()->getBill(ui->id3->text().toInt()));
 }
+
 void Server::on_paylist4_clicked()
 {
     ui->output->setText(database::getInstance()->getBill(ui->id4->text().toInt()));
@@ -345,42 +357,58 @@ void Server::on_detail1_clicked()
 {
     ui->output->setText(database::getInstance()->getDetailBill(ui->id1->text().toInt()));
 }
+
 void Server::on_detail2_clicked()
 {
     ui->output->setText(database::getInstance()->getDetailBill(ui->id2->text().toInt()));
 }
+
 void Server::on_detail3_clicked()
 {
     ui->output->setText(database::getInstance()->getDetailBill(ui->id3->text().toInt()));
 }
+
 void Server::on_detail4_clicked()
 {
     ui->output->setText(database::getInstance()->getDetailBill(ui->id4->text().toInt()));
 }
 
-
 void Server::schedule(){//1.遍历queue把服务完成的从机放到队尾；2.调用qSort对服务未完成的从机排序（选前三），依据优先级
+    //计数器，变为0时进行调度
     static int cnt = 10;
     if(cnt == 0){
-        QList<ClientBlock*> queue_schedule,queue_satisfied;
+        //服务未完成的放入queue_schedule，已完成的放入queue_satisfied
+        QList<ClientBlock*> queue_schedule, queue_satisfied;
         for (int i = 0;i != _queue.size();i++){
             if(_queue.at(i)->isSatisfied() == false)
                 queue_schedule.append(_queue.at(i));
             else
                 queue_satisfied.append(_queue.at(i));
         }
-        if(queue_schedule.size() > 4){
-            qsort(queue_schedule.begin(),queue_schedule.end(),compareSpeed);
+
+        qDebug() << "queue length:" << queue_schedule.size();
+        for (int i = 0; i != queue_schedule.size(); i++)
+        {
+            qDebug() << "room number:" <<queue_schedule[i]->getAttribute()->getRoomNum();
+            qDebug() << "isServed:" <<queue_schedule[i]->getAttribute()->getIsServed();
+            qDebug() << "isSatisfied:" <<queue_schedule[i]->isSatisfied();
         }
-        for(int i = 0;i != qMin(4,queue_schedule.size());i++){
-            if(queue_schedule.at(i)->getAttribute().getIsServed() == false){
-                queue_schedule.at(i)->getAttribute().setIsServed(true);
+        //若queue_schedule中有超过3个从机，根据优先级排序
+        if(queue_schedule.size() > 3){
+            sortByWindSpeed(queue_schedule);
+        }
+        //将queue_schedule中最多前三个从机服务
+        for(int i = 0;i != qMin(3,queue_schedule.size());i++){
+            if(queue_schedule.at(i)->getAttribute()->getIsServed() == false){
+                queue_schedule.at(i)->getAttribute()->setIsServed(true);
+                qDebug() << "isServed:" <<queue_schedule[i]->getAttribute()->getIsServed();
                 queue_schedule.at(i)->sendMessage();
             }
         }
+        //剩下的挂起
         for(int i = 3;i < queue_schedule.size();i++){
-            if(queue_schedule.at(i)->getAttribute().getIsServed() == true){
-                queue_schedule.at(i)->getAttribute().setIsServed() == false;
+            if(queue_schedule.at(i)->getAttribute()->getIsServed() == true){
+                queue_schedule.at(i)->getAttribute()->setIsServed(false);
                 queue_schedule.at(i)->sendMessage();
             }
         }
@@ -391,10 +419,22 @@ void Server::schedule(){//1.遍历queue把服务完成的从机放到队尾；2.
     return;
 }
 
-bool Server::compareSpeed(const ClientBlock* x,const ClientBlock* y)
+bool Server::compareSpeed(ClientBlock* x, ClientBlock* y)
 {
-    if(x->getAttribute().getWindSpeed() > y->getAttribute().getWindSpeed()) return true;
+    if(x->getAttribute()->getWindSpeed() > y->getAttribute()->getWindSpeed())
+        return true;
     return false;
 }
 
-
+void Server::sortByWindSpeed(QList<ClientBlock*> &queue)
+{
+    //冒泡排序
+    for(int i = queue.size() - 1; i > 0; i--)
+        for(int j = 0; j < i; i++)
+            if(queue[j]->getPriority() > queue[j + 1]->getPriority())
+            {
+                ClientBlock* temp = queue[j];
+                queue[j] = queue[j + 1];
+                queue[j + 1] = temp;
+            }
+}
