@@ -18,8 +18,9 @@ signals:
 public:
     explicit ClientBlock(QTcpSocket* socket,double lowestTmp,double highestTmp,double targetTmp, int mode,Server * server, QObject *parent = 0);//根据socket和主机工作模式构造CB
     ~ClientBlock();
-    int getPriority();              //更新优先级，得到优先级，数字越小优先级越大
-    Attribute *getAttribute();
+    
+    double getPriority();              //更新优先级，得到优先级，数字越小优先级越大
+    Attribute *getAttribute();      //得到属性
     void check();                   //先判断是否服务完成，再判断是否被挂起（挂起不变），若不为0count--, 若count==0，变温度，再判断是否达到目标温度，改变isFinished,发消息，重制count，
     void sendMessage();             //向从控机发送消息，包括变温，和被挂起
     bool isSatisfied();             //是否服务完成
