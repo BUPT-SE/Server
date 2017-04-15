@@ -56,11 +56,11 @@ void ClientBlock::sendFirstMessage()
     QJsonDocument document;
     QJsonObject json;
 
-    json.insert("mode",1);
-    json.insert("lowestTmp",15.0);
-    json.insert("highestTmp",30.0);
-    json.insert("targetTmp",26);
-    json.insert("isServed",false);
+    json.insert("mode", _attribute->getMode());
+    json.insert("lowestTmp", _attribute->getLowestTmp());
+    json.insert("highestTmp", _attribute->getHighestTmp());
+    json.insert("targetTmp", _attribute->getTargetTmp());
+    json.insert("isServed", false);
     document.setObject(json);
 
     QByteArray byteArray = document.toJson(QJsonDocument::Compact);
@@ -70,7 +70,7 @@ void ClientBlock::sendFirstMessage()
 void ClientBlock::readMessage()
 {
     QByteArray byteArray = _socket->readAll();
-
+    qDebug() << "recieve from client !";
     qDebug() << byteArray;
 
     QJsonParseError jsonError;
@@ -79,8 +79,6 @@ void ClientBlock::readMessage()
 
     if(jsonError.error == QJsonParseError::NoError)
     {
-
-        qDebug()<<byteArray;
         if(doucment.isObject())
         {
             if(json.contains("power"))
@@ -89,14 +87,26 @@ void ClientBlock::readMessage()
                 //如果是第一次请求
                 if(power.toBool() == true && _attribute->getPower() == false)
                 {
-                    sendFirstMessage();
-                    updateCount();
-                    _attribute->setFromJson(byteArray);
+                    QJsonValue roomNum = json.take("roomNum");
+                    int i = roomNum.toInt();
+                    //如果此房间还没有客户入住，则断开连接，销毁自身
+                    qDebug() << _server->rooms[i].check->text();
+                    if(_server->rooms[i].check->text() != "Check out")
+                    {
+                        _socket->disconnectFromHost();
+                        emit shutdown(this);
+                        return ;
+                    }
+                    else{
+                        sendFirstMessage();
+                        updateCount();
+                    }
                 }
                 //如果从机关机
-                else if(power.toBool()==false && _attribute->getPower()==true)
+                else if(power.toBool() == false && _attribute->getPower() == true)
                 {
-                    qDebug()<<"Client shut down!";
+					//断开连接并销毁自身
+                    qDebug() << "Client shut down!";
                     _socket->disconnectFromHost();
                     emit shutdown(this);
                 }
@@ -125,9 +135,14 @@ void ClientBlock::readMessage()
                     updateCount();
                 }
             }
+			_attribute->setFromJson(byteArray);
         }
+		//更新UI
+		int i = _attribute->getRoomNum();
+		_server->rooms[i].roomTmp->setText(QString::number((int)_attribute->getRoomTmp()));
+		_server->rooms[i].targetTmp->setText(QString::number((int)_attribute->getTargetTmp()));
+		_server->rooms[i].windSpeed->setText(QString::number((int)_attribute->getWindSpeed()));
     }
-    //更新UI
 }
 
 /*先判断是否服务完成，再判断是否被挂起（挂起不变），
@@ -176,22 +191,35 @@ void ClientBlock::check()
                 if(qAbs(_attribute->getTargetTmp() - _attribute->getRoomTmp()) < 0.1)
                 {
                     _attribute->setIsServed(false);
-                    _satisfied = true;
-
+                    sendMessage();//发送消息,停止服务
 
                     //数据库存储
+                }
+                //若当前为制热模式且室温高于目标温度，则停止服务
+                else if(_attribute->getMode() == Attribute::MODE_HEAT
+                        && _attribute->getRoomTmp() > _attribute->getTargetTmp())
+                {
+                    _satisfied = true;
+                    _attribute->setIsServed(false);
+                    sendMessage();//发送消息,停止服务
 
-                    //发送信号，更新客户端状态
-                    emit update(_attribute->getRoomNum());
+                    //数据库存储
                 }
                 else{
                     updateCount();
+                    sendMessage();//发送消息,更新温度和费用
                 }
-                sendMessage();//发送消息,更新温度和费用
             }
         }else{//挂起
             _suspended++;//记录挂起时间
         }
+
+		//更新UI
+		int i = _attribute->getRoomNum();
+		_server->rooms[i].roomTmp->setText(QString::number((int)_attribute->getRoomTmp()));
+		_server->rooms[i].Kwh->setText(QString::number(_attribute->getKwh()));
+		_server->rooms[i].fee->setText(QString::number(_attribute->getFee()));
+		_server->rooms[i].status->setText(QString::number(_attribute->getIsServed()));
     }
 }
 

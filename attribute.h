@@ -38,7 +38,9 @@ public:
     void setIsServed(const bool isServed);
     bool getIsServed() const;
     void setLowestTmp(const double lowestTmp);
+	double getLowestTmp() const;
     void setHighestTmp(const double highestTmp);
+	double getHighestTmp() const;
     void setFee(const double fee);
     double getFee() const;
     void setKwh(const double Kwh);

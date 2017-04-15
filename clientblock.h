@@ -14,7 +14,6 @@ public slots:
     void readMessage();             //判断请求是否合理，包括目标温度当前温度是否合理，若接收到关机请求，则发送shutdown信号
 signals:
     void shutdown(ClientBlock* );        //当接收到从控机的关机请求时，此信号用于通知Server销毁自己
-    void update(int roomNum);           //当收到消息时，触发此信号，主机面板上更新从机状态
     
 public:
     explicit ClientBlock(QTcpSocket* socket,double lowestTmp,double highestTmp,double targetTmp, int mode,Server * server, QObject *parent = 0);//根据socket和主机工作模式构造CB
@@ -28,14 +27,14 @@ public:
     void setMode(int mode);         //设置从机工作模式
     void setDefRoomTmp();           //设置从机缺省室温
     void sendFirstMessage();
+    QTcpSocket* _socket;            //套接字
 
 private:
     void updateCount();             //count变为0时，或从机发送风速变化请求，需根据风速重新计算count
+
 private:
     Server* _server;
     Attribute* _attribute;          //从控机，和从控机交互的一些属性
-    QTcpSocket* _socket;            //套接字
-
     //控制和数据库相关的信息
     int _count;                     //下次发送变温消息的计时器
     double _tmpFee;                 //本次服务的费用

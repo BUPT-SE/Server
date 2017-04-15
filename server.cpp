@@ -38,6 +38,7 @@ Server::Server(QWidget *parent) :
     room1.status=ui->status1;
     room1.Kwh=ui->Kwh1;
     room1.fee=ui->fee1;
+    room1.check=ui->check1;
 
     room2.id=ui->id2;
     room2.roomTmp=ui->roomTmp2;
@@ -47,6 +48,7 @@ Server::Server(QWidget *parent) :
     room2.status=ui->status2;
     room2.Kwh=ui->Kwh2;
     room2.fee=ui->fee2;
+    room2.check=ui->check2;
 
     room3.id=ui->id3;
     room3.roomTmp=ui->roomTmp3;
@@ -56,6 +58,7 @@ Server::Server(QWidget *parent) :
     room3.status=ui->status3;
     room3.Kwh=ui->Kwh3;
     room3.fee=ui->fee3;
+    room3.check=ui->check3;
 
     room4.id=ui->id4;
     room4.roomTmp=ui->roomTmp4;
@@ -65,6 +68,7 @@ Server::Server(QWidget *parent) :
     room4.status=ui->status4;
     room4.Kwh=ui->Kwh4;
     room4.fee=ui->fee4;
+    room4.check=ui->check4;
 
     rooms.append(room1);
     rooms.append(room2);
@@ -161,6 +165,15 @@ void Server::on_check1_clicked()
         ui->detail1->setEnabled(true);
         ui->check1->setText("Check in");
         ui->Room1->setEnabled(false);
+
+        for(QList<ClientBlock*>::iterator it = _queue.begin(); it != _queue.end(); it++)
+            if((*it)->getAttribute()->getRoomNum() == 0)
+            {
+                (*it)->_socket->disconnectFromHost();
+                delete (*it);
+                _queue.erase(it);
+                break;
+            }
     }
 }
 
@@ -182,6 +195,15 @@ void Server::on_check2_clicked()
         ui->paylist2->setEnabled(true);
         ui->detail2->setEnabled(true);
         ui->check2->setText("Check in");
+
+        for(QList<ClientBlock*>::iterator it = _queue.begin(); it != _queue.end(); it++)
+            if((*it)->getAttribute()->getRoomNum() == 1)
+            {
+                (*it)->_socket->disconnectFromHost();
+                delete (*it);
+                _queue.erase(it);
+                break;
+            }
     }
 }
 
@@ -203,6 +225,15 @@ void Server::on_check3_clicked()
         ui->paylist3->setEnabled(true);
         ui->detail3->setEnabled(true);
         ui->check3->setText("Check in");
+
+        for(QList<ClientBlock*>::iterator it = _queue.begin(); it != _queue.end(); it++)
+            if((*it)->getAttribute()->getRoomNum() == 2)
+            {
+                (*it)->_socket->disconnectFromHost();
+                delete (*it);
+                _queue.erase(it);
+                break;
+            }
     }
 }
 
@@ -218,13 +249,21 @@ void Server::on_check4_clicked()
         rooms[3].roomNum->setText("3");
         rooms[3].Kwh->setText("0");
         rooms[3].fee->setText("0");
-
         ui->check4->setText("Check out");
     }
     else{
         ui->paylist4->setEnabled(true);
         ui->detail4->setEnabled(true);
         ui->check4->setText("Check in");
+
+        for(QList<ClientBlock*>::iterator it = _queue.begin(); it != _queue.end(); it++)
+            if((*it)->getAttribute()->getRoomNum() == 3)
+            {
+                (*it)->_socket->disconnectFromHost();
+                delete (*it);
+                _queue.erase(it);
+                break;
+            }
     }
 }
 
@@ -412,6 +451,12 @@ void Server::schedule(){//1.遍历queue把服务完成的从机放到队尾；2.
         _queue.clear();
         _queue = queue_schedule + queue_satisfied;
         cnt = 10;
+
+		//更新UI
+		for (int i = 0; i < _queue.size(); i++) {
+			rooms[i].status->setText(QString::number(_queue[i]->getAttribute()->getIsServed()));
+		}
+		
     }else cnt --;
     return;
 }
