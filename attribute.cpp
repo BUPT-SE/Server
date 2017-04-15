@@ -169,6 +169,16 @@ void Attribute::setHighestTmp(const double highestTmp)
     _highestTmp = highestTmp;
 }
 
+double Attribute::getLowestTmp() const 
+{
+	return _lowestTmp;
+}
+
+double Attribute::getHighestTmp() const
+{
+	return _highestTmp;
+}
+
 void Attribute::setFee(const double fee)
 {
     _fee = fee;

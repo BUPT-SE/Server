@@ -1,7 +1,8 @@
 ﻿#ifndef ROOMS_H
 #define ROOMS_H
 
-#include<QLabel>
+#include <QLabel>
+#include <QPushButton>
 
 struct room{
     QLabel* id;
@@ -12,6 +13,7 @@ struct room{
     QLabel* status;
     QLabel* Kwh;
     QLabel* fee;
+    QPushButton* check;
 };
 
 #endif // ROOMS_H
