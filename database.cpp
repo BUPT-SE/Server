@@ -1,5 +1,6 @@
 ﻿#include "database.h"
 #include "server.h"
+#include <QDebug>
 
 database::database()
 {
@@ -46,6 +47,7 @@ database* database::getInstance()
 
 void database::insertCheck(struct operation entry)
 {
+    qDebug() << entry.time << endl;
     QSqlQuery query;
     query.prepare("INSERT INTO check_in_out "
                   "(room_id, customer_id, time, operation) "
@@ -162,9 +164,9 @@ QString database::getDetailBill(int customerId)
 
         while (subquery.next()) {
             //详单时间信息
-            result += QString("服务房间：%1 \n"
-                              "服务起始时间：%2 \n"
-                              "服务结束时间：%3 \n")
+            result += QString::fromLocal8Bit("服务房间：%1 \n"
+                                             "服务起始时间：%2 \n"
+                                             "服务结束时间：%3 \n")
                     .arg(subquery.value(0).toInt())
                     .arg(subquery.value(2).toDateTime().toString("yyyy-MM-dd hh:mm:ss"))
                     .arg(subquery.value(3).toDateTime().toString("yyyy-MM-dd hh:mm:ss"));
@@ -172,35 +174,35 @@ QString database::getDetailBill(int customerId)
             //详单风速信息
             if (subquery.value(4).toInt() == 0)
             {
-                result += "风速： 低 \n";
+                result += QString::fromLocal8Bit("风速： 低 \n");
             }
             else if (subquery.value(4).toInt() == 1)
             {
-                result += "风速： 中 \n";
+                result += QString::fromLocal8Bit("风速： 中 \n");
             }
             else
             {
-                result += "风速： 高 \n";
+                result += QString::fromLocal8Bit("风速： 高 \n");
             }
 
             //详单模式信息
             if (subquery.value(5).toInt() == 0)
             {
-                result += "工作模式：制冷 \n";
+                result += QString::fromLocal8Bit("工作模式：制冷 \n");
             }
             else
             {
-                result += "工作模式：制热 \n";
+                result += QString::fromLocal8Bit("工作模式：制热 \n");
             }
 
             //详单能量费用信息
-            result += QString("消耗能量：%1 KWH \n"
+            result += QString::fromLocal8Bit("消耗能量：%1 KWH \n"
                               "该次消费金额：%2 元 \n")
                     .arg(subquery.value(6).toDouble())
                     .arg(subquery.value(7).toDouble());
         }
 
-        result += "在 " + poweroffTime.toString("yyyy-MM-dd hh:mm:ss") + " 关机 \n";
+        result += QString::fromLocal8Bit("在 ") + poweroffTime.toString("yyyy-MM-dd hh:mm:ss") + QString::fromLocal8Bit(" 关机 \n");
     }
 
     //计算总消费

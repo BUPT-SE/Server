@@ -8,7 +8,6 @@
 #include <QLabel>
 #include <QDateTime>
 #include <QTimer>
-#include "attribute.h"
 #include "clientblock.h"
 #include "room.h"
 #include "database.h"
@@ -22,21 +21,20 @@ class ClientBlock;
 
 class Server : public QWidget{
     Q_OBJECT
-public slots:
-    void onTimeOut();
-    //void updateUI();//更新面板上各从机的状态
-  
+
 public:
     explicit Server(QWidget *parent = 0);
     ~Server();
     void schedule();//1.遍历queue把服务完成的从机放到队尾；2.调用qSort对服务未完成的从机排序（选前三），依据优先级
-    Attribute attribute;
     QVector<room> rooms;
 
 private slots:
     void newConnection();
-    void disConnection(ClientBlock* clientBlock);
-  
+    void disConnection(ClientBlock *client);
+    void onTimeOut();
+    void updateUI(ClientBlock *client);//更新面板上各从机的状态
+    void checkIsCheckedIn(ClientBlock *client);
+
     void on_check1_clicked();
     void on_check2_clicked();
     void on_check3_clicked();
@@ -57,10 +55,11 @@ private:
     Ui::Server *ui;
     QTcpServer *_tcpServer;
     QList<ClientBlock *> _queue;//存四个从控机，最多前三个是正在被服务
-    QTimer *timer;
-    int t,Year,Month,Day,Hour,Min,nextClientID;
-    int clientID[4];
+    QTimer *_timer;
+    int _Year, _Month, _Day, _Hour, _Min, _t;
+    int _nextClientID;
+    int _clientID[4];
     void sortByWindSpeed(QList<ClientBlock*> &queue);
-    bool compareSpeed(ClientBlock *x, ClientBlock *y);
+    QString _sysTime;
 };
 #endif // SERVER_H

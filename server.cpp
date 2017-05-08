@@ -7,19 +7,18 @@
 #include "room.h"
 #include "database.h"
 
-
 Server::Server(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Server),
-    timer(new QTimer())
+    _timer(new QTimer())
 {
-    t = 0;
-    nextClientID = 1;
+    _t = 0;
+    _nextClientID = 1;
     ui->setupUi(this);
 
     //初始化tcpServer监听所有的连接请求
     _tcpServer = new QTcpServer();
-    if(!_tcpServer->listen(QHostAddress::LocalHost, 666))
+    if(!_tcpServer->listen(QHostAddress::Any, 6666))
     {
         qDebug() <<"Contect Error";
     }
@@ -29,6 +28,7 @@ Server::Server(QWidget *parent) :
     }
     connect(_tcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 
+    //四个房间和ui上控件指针关联
     room room1,room2,room3,room4;
     room1.id=ui->id1;
     room1.roomTmp=ui->roomTmp1;
@@ -70,10 +70,10 @@ Server::Server(QWidget *parent) :
     room4.fee=ui->fee4;
     room4.check=ui->check4;
 
-    rooms.append(room1);
-    rooms.append(room2);
-    rooms.append(room3);
-    rooms.append(room4);
+    rooms.push_back(room1);
+    rooms.push_back(room2);
+    rooms.push_back(room3);
+    rooms.push_back(room4);
 
     ui->paylist1->setEnabled(false);
     ui->detail1->setEnabled(false);
@@ -99,7 +99,7 @@ Server::Server(QWidget *parent) :
     ui->configBox->setEnabled(true);
 
     //连接定时器和槽
-    connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
+    connect(_timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
 }
 
 Server::~Server()
@@ -121,149 +121,250 @@ void Server::newConnection()
                                                   ui->lowestTmpEdit->text().toDouble(),
                                                   ui->highestTmpEdit->text().toDouble(),
                                                   ui->targetTmpEdit->text().toDouble(),
-                                                  mode, this, 0);
+                                                  mode, 0);
     this->_queue.push_back(newClientBlock);
 
     //连接信号和槽
     connect(newClientBlock, SIGNAL(shutdown(ClientBlock*)), this, SLOT(disConnection(ClientBlock*)));
+    connect(newClientBlock, SIGNAL(isCheckedIn(ClientBlock*)), this, SLOT(checkIsCheckedIn(ClientBlock*)));
+    connect(newClientBlock, SIGNAL(update(ClientBlock*)), this, SLOT(updateUI(ClientBlock*)));
 }
 
-void Server::disConnection(ClientBlock* clientBlock)
+void Server::disConnection(ClientBlock* client)
 {
     QList<ClientBlock*>::iterator it;
-    qDebug() << "queue length" << _queue.size() << endl;
+    qDebug() << "queue length!!!!!!" << _queue.size() << endl;
     for(it = _queue.begin(); it != _queue.end(); it++)
-    {
-        //如果找到了这个房间对应的block
-        if(*it == clientBlock)
         {
-            _queue.erase(it);
-            break;
+            //如果找到了这个房间对应的block
+            if(*it == client)
+            {
+                //更新UI
+                rooms[client->getRoomNum()].status->setText(QString::fromLocal8Bit("关机"));
+                //从队列中删除
+                _queue.erase(it);
+                break;
+            }
         }
-    }
     qDebug() << "queue length" << _queue.size()<<endl;
-    delete clientBlock;
+    delete client;
 }
 
 void Server::on_check1_clicked()
 {
     if(ui->check1->text()=="Check in"){
-        clientID[0]=nextClientID;
-        nextClientID++;
+        _clientID[0]=_nextClientID;
+        _nextClientID++;
         ui->Room1->setEnabled(true);
         ui->paylist1->setEnabled(false);
         ui->detail1->setEnabled(false);
 
-        rooms[0].id->setText(QString::number(clientID[0],10));
+        rooms[0].id->setText(QString::number(_clientID[0],10));
         rooms[0].roomNum->setText("0");
         rooms[0].Kwh->setText("0");
         rooms[0].fee->setText("0");
         ui->check1->setText("Check out");
+
+        //数据库写入
+        operation oper;
+        oper.customerId = _clientID[0];
+        oper.roomId = 0;
+        oper.oper = 0;//check in
+        oper.time = _sysTime;
+        database::getInstance()->insertCheck(oper);
     }
     else{
         ui->paylist1->setEnabled(true);
         ui->detail1->setEnabled(true);
         ui->check1->setText("Check in");
+        rooms[0].status->setText(QString::fromLocal8Bit("关机"));
         ui->Room1->setEnabled(false);
 
         for(QList<ClientBlock*>::iterator it = _queue.begin(); it != _queue.end(); it++)
-            if((*it)->getAttribute()->getRoomNum() == 0)
+            if((*it)->getRoomNum() == 0)
             {
                 (*it)->_socket->disconnectFromHost();
                 delete (*it);
                 _queue.erase(it);
+                //数据库写入
+                operation oper;
+                oper.customerId = _clientID[0];
+                oper.roomId = 0;
+                oper.oper = 1;//关机
+                oper.time = _sysTime;
+                database::getInstance()->insertPower(oper);
                 break;
             }
+
+        //数据库写入
+        operation oper;
+        oper.customerId = _clientID[0];
+        oper.roomId = 0;
+        oper.oper = 1;//check out
+        oper.time = _sysTime;
+        database::getInstance()->insertCheck(oper);
     }
 }
 
 void Server::on_check2_clicked()
 {
     if(ui->check2->text()=="Check in"){
-        clientID[1]=nextClientID;
-        nextClientID++;
+        _clientID[1]=_nextClientID;
+        _nextClientID++;
         ui->Room2->setEnabled(true);
         ui->paylist2->setEnabled(false);
         ui->detail2->setEnabled(false);
-        rooms[1].id->setText(QString::number(clientID[1],10));
+        rooms[1].id->setText(QString::number(_clientID[1],10));
         rooms[1].roomNum->setText("1");
         rooms[1].Kwh->setText("0");
         rooms[1].fee->setText("0");
         ui->check2->setText("Check out");
+
+        //数据库写入
+        operation oper;
+        oper.customerId = _clientID[1];
+        oper.roomId = 1;
+        oper.oper = 0;//check in
+        oper.time = _sysTime;
+        database::getInstance()->insertCheck(oper);
     }
     else{
         ui->paylist2->setEnabled(true);
         ui->detail2->setEnabled(true);
         ui->check2->setText("Check in");
+        rooms[1].status->setText(QString::fromLocal8Bit("关机"));
 
         for(QList<ClientBlock*>::iterator it = _queue.begin(); it != _queue.end(); it++)
-            if((*it)->getAttribute()->getRoomNum() == 1)
+            if((*it)->getRoomNum() == 1)
             {
                 (*it)->_socket->disconnectFromHost();
                 delete (*it);
                 _queue.erase(it);
+                //数据库写入
+                operation oper;
+                oper.customerId = _clientID[1];
+                oper.roomId = 1;
+                oper.oper = 1;//关机
+                oper.time = _sysTime;
+                database::getInstance()->insertPower(oper);
                 break;
             }
+
+        //数据库写入
+        operation oper;
+        oper.customerId = _clientID[1];
+        oper.roomId = 1;
+        oper.oper = 1;//check out
+        oper.time = _sysTime;
+        database::getInstance()->insertCheck(oper);
     }
 }
 
 void Server::on_check3_clicked()
 {
     if(ui->check3->text()=="Check in"){
-        clientID[2]=nextClientID;
-        nextClientID++;
+        _clientID[2]=_nextClientID;
+        _nextClientID++;
         ui->Room3->setEnabled(true);
         ui->paylist3->setEnabled(false);
         ui->detail3->setEnabled(false);
-        rooms[2].id->setText(QString::number(clientID[2],10));
+        rooms[2].id->setText(QString::number(_clientID[2],10));
         rooms[2].roomNum->setText("2");
         rooms[2].Kwh->setText("0");
         rooms[2].fee->setText("0");
         ui->check3->setText("Check out");
+
+        //数据库写入
+        operation oper;
+        oper.customerId = _clientID[2];
+        oper.roomId = 2;
+        oper.oper = 0;//check in
+        oper.time = _sysTime;
+        database::getInstance()->insertCheck(oper);
     }
     else{
         ui->paylist3->setEnabled(true);
         ui->detail3->setEnabled(true);
         ui->check3->setText("Check in");
+        rooms[2].status->setText(QString::fromLocal8Bit("关机"));
 
         for(QList<ClientBlock*>::iterator it = _queue.begin(); it != _queue.end(); it++)
-            if((*it)->getAttribute()->getRoomNum() == 2)
+            if((*it)->getRoomNum() == 2)
             {
                 (*it)->_socket->disconnectFromHost();
                 delete (*it);
                 _queue.erase(it);
+                //数据库写入
+                operation oper;
+                oper.customerId = _clientID[2];
+                oper.roomId = 2;
+                oper.oper = 1;//关机
+                oper.time = _sysTime;
+                database::getInstance()->insertPower(oper);
                 break;
             }
+
+        //数据库写入
+        operation oper;
+        oper.customerId = _clientID[2];
+        oper.roomId = 2;
+        oper.oper = 1;//check out
+        oper.time = _sysTime;
+        database::getInstance()->insertCheck(oper);
     }
 }
 
 void Server::on_check4_clicked()
 {
     if(ui->check4->text()=="Check in"){
-        clientID[3]=nextClientID;
-        nextClientID++;
+        _clientID[3]=_nextClientID;
+        _nextClientID++;
         ui->Room4->setEnabled(true);
         ui->paylist4->setEnabled(false);
         ui->detail4->setEnabled(false);
-        rooms[3].id->setText(QString::number(clientID[3],10));
+        rooms[3].id->setText(QString::number(_clientID[3],10));
         rooms[3].roomNum->setText("3");
         rooms[3].Kwh->setText("0");
         rooms[3].fee->setText("0");
         ui->check4->setText("Check out");
+
+        //数据库写入
+        operation oper;
+        oper.customerId = _clientID[3];
+        oper.roomId = 3;
+        oper.oper = 0;//check in
+        oper.time = _sysTime;
+        database::getInstance()->insertCheck(oper);
     }
     else{
         ui->paylist4->setEnabled(true);
         ui->detail4->setEnabled(true);
         ui->check4->setText("Check in");
+        rooms[3].status->setText(QString::fromLocal8Bit("关机"));
 
         for(QList<ClientBlock*>::iterator it = _queue.begin(); it != _queue.end(); it++)
-            if((*it)->getAttribute()->getRoomNum() == 3)
+            if((*it)->getRoomNum() == 3)
             {
                 (*it)->_socket->disconnectFromHost();
                 delete (*it);
                 _queue.erase(it);
+                //数据库写入
+                operation oper;
+                oper.customerId = _clientID[3];
+                oper.roomId = 3;
+                oper.oper = 1;//关机
+                oper.time = _sysTime;
+                database::getInstance()->insertPower(oper);
                 break;
             }
+
+        //数据库写入
+        operation oper;
+        oper.customerId = _clientID[3];
+        oper.roomId = 3;
+        oper.oper = 1;//check out
+        oper.time = _sysTime;
+        database::getInstance()->insertCheck(oper);
     }
 }
 
@@ -284,50 +385,117 @@ void Server::on_onButton_clicked()
     ui->sec->setEnabled(true);
     QDateTime Date=QDateTime::currentDateTime();
     QTime time=QTime::currentTime();
-    Year=Date.date().year();
-    Month=Date.date().month();
-    Day=Date.date().day();
-    Hour=time.hour();
-    Min=time.minute();
-    t = time.second();
-    timer->start(1000);
+    _Year=Date.date().year();
+    _Month=Date.date().month();
+    _Day=Date.date().day();
+    _Hour=time.hour();
+    _Min=time.minute();
+    _t = time.second();
+    _timer->start(1000);
 }
 
 void Server::onTimeOut()
 {
-    t++;
-    if(t == 60){
-        t = 0;
-        Min++;
-        if(Min==60){
-            Min=0;
-            Hour++;
-            if(Hour==24){
-                Hour=0;
-                Day++;
+    _t++;
+    if(_t == 60){
+        _t = 0;
+        _Min++;
+        if(_Min==60){
+            _Min=0;
+            _Hour++;
+            if(_Hour==24){
+                _Hour=0;
+                _Day++;
             }
         }
     }
-    ui->sec->display(t);
-    ui->year->display(Year);
-    ui->month->display(Month);
-    ui->day->display(Day);
-    ui->hour->display(Hour);
-    ui->min->display(Min);
+    ui->sec->display(_t);
+    ui->year->display(_Year);
+    ui->month->display(_Month);
+    ui->day->display(_Day);
+    ui->hour->display(_Hour);
+    ui->min->display(_Min);
+
+    _sysTime = QString::number(_Year);
+    _sysTime += "-" + QString::number(_Month);
+    _sysTime += "-" + QString::number(_Day);
+    _sysTime += " " + QString::number(_Hour);
+    _sysTime += ":" + QString::number(_Min);
+    _sysTime += ":" + QString::number(_t);
 
     qDebug() << "time out!";
     for(ClientBlock *client : _queue)
     {
+        client->setSysTime(_sysTime);
         client->check();
     }
     schedule();
 }
 
+void Server::updateUI(ClientBlock* client)
+{
+    //qDebug() << "更新UI！！！";
+    int i = client->getRoomNum();
+    rooms[i].roomTmp->setText(QString::number(qRound(client->getRoomTmp())));
+    rooms[i].targetTmp->setText(QString::number(qRound(client->getTargetTmp())));
+    switch (client->getWindSpeed())
+    {
+    case 0:
+        rooms[i].windSpeed->setText(QString::fromLocal8Bit("低风速"));
+        break;
+    case 1:
+        rooms[i].windSpeed->setText(QString::fromLocal8Bit("中风速"));
+        break;
+    case 2:
+        rooms[i].windSpeed->setText(QString::fromLocal8Bit("高风速"));
+        break;
+    default:
+        break;
+    }
+    rooms[i].fee->setText(QString::number(client->getFee(), 10, 2));
+    rooms[i].Kwh->setText(QString::number(client->getKwh(), 10, 2));
+    if(client->isServed())
+        rooms[i].status->setText(QString::fromLocal8Bit("服务"));
+    else
+        rooms[i].status->setText(QString::fromLocal8Bit("挂起"));
+}
+
+void Server::checkIsCheckedIn(ClientBlock* client)
+{
+    int i = client->getRoomNum();
+    if(rooms[i].check->text() == "Check in")
+    {
+        client->setIsCheckedIn(false);
+    }
+    else
+        client->setID(rooms[i].id->text().toInt());
+}
+
 void Server::on_okButton_clicked()
 {
-    ui->configBox->setEnabled(false);
-    ui->onButton->setEnabled(true);
-    ui->offButton->setEnabled(true);
+    //保证缺省目标温度在温控范围内
+    if(ui->highestTmpEdit->text().toInt() >= ui->targetTmpEdit->text().toInt()
+       && ui->lowestTmpEdit->text().toInt() <= ui->targetTmpEdit->text().toInt())
+    {
+        //制冷模式下的温控范围为18-25
+        if(ui->coolRadio->isChecked()
+           && ui->highestTmpEdit->text().toInt() <= 25
+           && ui->lowestTmpEdit->text().toInt() >= 18)
+        {
+            ui->configBox->setEnabled(false);
+            ui->onButton->setEnabled(true);
+            ui->offButton->setEnabled(true);
+        }
+        //制热模式下的温控范围为25-30
+        else if(ui->heatRadio->isChecked()
+              && ui->highestTmpEdit->text().toInt() <= 30
+              && ui->lowestTmpEdit->text().toInt() >= 25)
+        {
+            ui->configBox->setEnabled(false);
+            ui->onButton->setEnabled(true);
+            ui->offButton->setEnabled(true);
+        }
+    }
 }
 
 void Server::on_offButton_clicked()
@@ -361,7 +529,7 @@ void Server::on_offButton_clicked()
     ui->offButton->setEnabled(false);
     ui->configBox->setEnabled(true);
 
-    timer->stop();
+    _timer->stop();
     ui->year->setEnabled(false);
     ui->month->setEnabled(false);
     ui->day->setEnabled(false);
@@ -425,8 +593,8 @@ void Server::schedule(){//1.遍历queue把服务完成的从机放到队尾；2.
         qDebug() << "queue length:" << queue_schedule.size();
         for (int i = 0; i != queue_schedule.size(); i++)
         {
-            qDebug() << "room number:" <<queue_schedule[i]->getAttribute()->getRoomNum();
-            qDebug() << "isServed:" <<queue_schedule[i]->getAttribute()->getIsServed();
+            qDebug() << "room number:" <<queue_schedule[i]->getRoomNum();
+            qDebug() << "isServed:" <<queue_schedule[i]->isServed();
             qDebug() << "isSatisfied:" <<queue_schedule[i]->isSatisfied();
         }
         //若queue_schedule中有超过3个从机，根据优先级排序
@@ -435,16 +603,16 @@ void Server::schedule(){//1.遍历queue把服务完成的从机放到队尾；2.
         }
         //将queue_schedule中最多前三个从机服务
         for(int i = 0;i != qMin(3,queue_schedule.size());i++){
-            if(queue_schedule.at(i)->getAttribute()->getIsServed() == false){
-                queue_schedule.at(i)->getAttribute()->setIsServed(true);
-                qDebug() << "isServed:" <<queue_schedule[i]->getAttribute()->getIsServed();
+            if(queue_schedule.at(i)->isServed() == false){
+                queue_schedule.at(i)->setIsServed(true);
+                qDebug() << "isServed:" << queue_schedule[i]->isServed();
                 queue_schedule.at(i)->sendMessage();
             }
         }
         //剩下的挂起
         for(int i = 3;i < queue_schedule.size();i++){
-            if(queue_schedule.at(i)->getAttribute()->getIsServed() == true){
-                queue_schedule.at(i)->getAttribute()->setIsServed(false);
+            if(queue_schedule.at(i)->isServed() == true){
+                queue_schedule.at(i)->setIsServed(false);
                 queue_schedule.at(i)->sendMessage();
             }
         }
@@ -454,25 +622,21 @@ void Server::schedule(){//1.遍历queue把服务完成的从机放到队尾；2.
 
 		//更新UI
 		for (int i = 0; i < _queue.size(); i++) {
-			rooms[i].status->setText(QString::number(_queue[i]->getAttribute()->getIsServed()));
+            if(_queue[i]->isServed())
+                rooms[i].status->setText(QString::fromLocal8Bit("服务"));
+            else
+                rooms[i].status->setText(QString::fromLocal8Bit("挂起"));
 		}
 		
     }else cnt --;
     return;
 }
 
-bool Server::compareSpeed(ClientBlock* x, ClientBlock* y)
-{
-    if(x->getAttribute()->getWindSpeed() > y->getAttribute()->getWindSpeed())
-        return true;
-    return false;
-}
-
 void Server::sortByWindSpeed(QList<ClientBlock*> &queue)
 {
     //冒泡排序
     for(int i = queue.size() - 1; i > 0; i--)
-        for(int j = 0; j < i; i++)
+        for(int j = 0; j < i; j++)
             if(queue[j]->getPriority() > queue[j + 1]->getPriority())
             {
                 ClientBlock* temp = queue[j];
