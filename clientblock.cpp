@@ -1,24 +1,27 @@
-#include "clientblock.h"
+﻿#include "clientblock.h"
 #include <QDebug>
 
-ClientBlock::ClientBlock(QTcpSocket *socket, double lowestTmp, double highestTmp,double targetTmp, int mode, Server *server, QObject *parent)
-            :QObject(parent)
+ClientBlock::ClientBlock(QTcpSocket* socket, double lowestTmp, double highestTmp,
+                         double targetTmp, int mode, QObject *parent) : QObject(parent)
 {
+    _id = -1;
+    _isCheckedIn = true;
     _socket = socket;
-    _attribute = new Attribute();
-    _attribute->setLowestTmp(lowestTmp);
-    _attribute->setHighestTmp(highestTmp);
-    _attribute->setTargetTmp(targetTmp);
-    _attribute->setIsServed(false);
-    _attribute->setPower(false);
-    _attribute->setMode(mode);
-    _server = server;
+    _lowestTmp = lowestTmp;
+    _highestTmp = highestTmp;
+    _targetTmp = targetTmp;
+    _isServed = false;
+    _isSatisfied = false;
+    _power = false;
+    _mode = mode;
     _suspended = 0;
     _count = 0;
     _tmpFee = 0;
     _tmpKwh = 0;
+    _fee = 0;
+    _Kwh = 0;
     _suspended = 0;
-    _satisfied = false;
+    _isSatisfied = false;
 
     //连接信号和槽
     connect(socket, SIGNAL(readyRead()), this, SLOT(readMessage()));
@@ -26,24 +29,60 @@ ClientBlock::ClientBlock(QTcpSocket *socket, double lowestTmp, double highestTmp
 
 ClientBlock::~ClientBlock()
 {
-    delete _attribute;
+
 }
 
-double ClientBlock::getPriority()
+int ClientBlock::get_Served(){
+    return _served;
+}
+
+void ClientBlock::setID(int id)
 {
-    int p;//优先级越大，数字越小
-    //优先级与风速有关，风速越大，优先级越大
-    p = 3 - _attribute->getWindSpeed()-_suspended/10000;
-    return p;
+    _id = id;
+}
+
+void ClientBlock::setIsCheckedIn(bool flag)
+{
+    _isCheckedIn = flag;
+}
+
+int ClientBlock::getRoomNum()
+{
+    return _roomNum;
+}
+
+double ClientBlock::getRoomTmp()
+{
+    return _roomTmp;
+}
+
+double ClientBlock::getTargetTmp()
+{
+    return _targetTmp;
+}
+
+int ClientBlock::getWindSpeed()
+{
+    return _windSpeed;
+}
+
+double ClientBlock::getFee()
+{
+    return _fee;
+}
+
+double ClientBlock::getKwh()
+{
+    return _Kwh;
 }
 
 void ClientBlock::sendMessage()
 {
     QJsonDocument document;
-    document.setObject(_attribute->toJson());
+    document.setObject(toJson());
     QByteArray byteArray = document.toJson(QJsonDocument::Compact);
 
-    qDebug() << "send message to client.";
+    qDebug() << "send message to client!";
     qDebug() << byteArray;
 
     _socket->write((byteArray));
@@ -51,20 +90,25 @@ void ClientBlock::sendMessage()
 
 void ClientBlock::sendFirstMessage()
 {
-    qDebug() << "send first message to client."<<endl;
-
+    qDebug() << "send first message to client!";
     QJsonDocument document;
     QJsonObject json;
 
-    json.insert("mode", _attribute->getMode());
-    json.insert("lowestTmp", _attribute->getLowestTmp());
-    json.insert("highestTmp", _attribute->getHighestTmp());
-    json.insert("targetTmp", _attribute->getTargetTmp());
-    json.insert("isServed", false);
+    json.insert("mode", _mode);
+    json.insert("lowestTmp", _lowestTmp);
+    json.insert("highestTmp", _highestTmp);
+    json.insert("targetTmp", _targetTmp);
+    json.insert("roomTmp", _roomTmp);
+    json.insert("isServed", _isServed);
     document.setObject(json);
 
     QByteArray byteArray = document.toJson(QJsonDocument::Compact);
     _socket->write(byteArray);
+}
+
+void ClientBlock::setSysTime(QString time)
+{
+    _sysTime = time;
 }
 
 void ClientBlock::readMessage()
@@ -81,67 +125,81 @@ void ClientBlock::readMessage()
     {
         if(doucment.isObject())
         {
-            if(json.contains("power"))
+            QJsonValue roomNum = json.take("roomNum");
+            QJsonValue roomTmp = json.take("roomTmp");
+            QJsonValue targetTmp = json.take("targetTmp");
+            QJsonValue windSpeed = json.take("windSpeed");
+            QJsonValue power = json.take("power");
+            QJsonValue fee = json.take("fee");
+            QJsonValue Kwh = json.take("Kwh");
+
+            //如果是第一次请求
+            if(power.toBool() == true && _power == false)
             {
-                QJsonValue power = json.take("power");
-                //如果是第一次请求
-                if(power.toBool() == true && _attribute->getPower() == false)
+                //写入副本
+                _roomNum = roomNum.toInt();
+                _roomTmp = roomTmp.toDouble();
+                _windSpeed = windSpeed.toInt();
+                _power = power.toBool();
+                _fee = fee.toDouble();
+                _Kwh = Kwh.toDouble();
+
+                emit isCheckedIn(this);
+                qDebug() << "check in???" << _isCheckedIn;
+                if(!_isCheckedIn)
                 {
-                    QJsonValue roomNum = json.take("roomNum");
-                    int i = roomNum.toInt();
-                    //如果此房间还没有客户入住，则断开连接，销毁自身
-                    qDebug() << _server->rooms[i].check->text();
-                    if(_server->rooms[i].check->text() != "Check out")
-                    {
-                        _socket->disconnectFromHost();
-                        emit shutdown(this);
-                        return ;
-                    }
-                    else{
-                        sendFirstMessage();
-                        updateCount();
-                    }
-                }
-                //如果从机关机
-                else if(power.toBool() == false && _attribute->getPower() == true)
-                {
-					//断开连接并销毁自身
-                    qDebug() << "Client shut down!";
                     _socket->disconnectFromHost();
                     emit shutdown(this);
+                    return ;
                 }
+
+                //发送第一条消息
+                sendFirstMessage();
+                updateCount();
+                //数据库写入
+                operation oper;
+                oper.roomId = _roomNum;
+                oper.customerId = _id;
+                oper.oper = 0;//开机
+                database::getInstance()->insertPower(oper);
+                //更新UI
+                emit update(this);
+                return;
             }
-            if(json.contains("windSpeed"))
+            //如果从机关机
+            else if(power.toBool() == false && _power == true)
             {
-                //如果风速有变化
-                QJsonValue windSpeed = json.take("windSpeed");
-                if(windSpeed.toInt() != _attribute->getWindSpeed())
-                {
-                    _attribute->setFromJson(byteArray);
-                    //更新count
-                    updateCount();
-                }
+                //断开连接
+                qDebug() << "Client shut down!";
+                _socket->disconnectFromHost();
+                //数据库写入
+                operation oper;
+                oper.roomId = _roomNum;
+                oper.customerId = _id;
+                oper.oper = 1;//关机
+                database::getInstance()->insertPower(oper);
+                //销毁自身
+                emit shutdown(this);
+                return ;
             }
-            if(json.contains("targetTmp") && json.contains("roomTmp"))
+            //写入副本
+            _roomNum = roomNum.toInt();
+            //室温变化超过一度则认为是变温请求
+            if(_isSatisfied && qAbs(roomTmp.toDouble() - _roomTmp) >= 1)
             {
-                QJsonValue targetTmp = json.take("targetTmp");
-                QJsonValue roomTmp = json.take("roomTmp");
-                //服务完成后室温变化超过1度则重新进行温控请求
-                if(_satisfied == true && qAbs(targetTmp.toDouble() - roomTmp.toDouble()) > 1)
-                {
-                    _satisfied = false;
-                    _attribute->setFromJson(byteArray);
-                    //更新count
-                    updateCount();
-                }
+                _roomTmp = roomTmp.toDouble();
+                _isSatisfied = false;
             }
-			_attribute->setFromJson(byteArray);
+            _targetTmp = targetTmp.toDouble();
+            _power = power.toBool();
+            if(windSpeed.toInt() != _windSpeed)
+            {
+                _windSpeed = windSpeed.toInt();
+                updateCount();
+            }
+            //更新UI
+            emit update(this);
         }
-		//更新UI
-		int i = _attribute->getRoomNum();
-		_server->rooms[i].roomTmp->setText(QString::number((int)_attribute->getRoomTmp()));
-		_server->rooms[i].targetTmp->setText(QString::number((int)_attribute->getTargetTmp()));
-		_server->rooms[i].windSpeed->setText(QString::number((int)_attribute->getWindSpeed()));
     }
 }
 
@@ -152,100 +210,115 @@ void ClientBlock::readMessage()
  */
 void ClientBlock::check()
 {
-    //若当前为制冷模式且目标温度高于室温，则停止服务
-    if(_attribute->getMode() == Attribute::MODE_COOL
-       && _attribute->getTargetTmp() > _attribute->getRoomTmp())
+    if(!_isSatisfied)
     {
-        _satisfied = true;
-        _attribute->setIsServed(false);
-        sendMessage();//发送消息,更新温度和费用
-    }
-    //若当前为制热模式且室温高于目标温度，则停止服务
-    else if(_attribute->getMode() == Attribute::MODE_HEAT
-            && _attribute->getRoomTmp() > _attribute->getTargetTmp())
-    {
-        _satisfied = true;
-        _attribute->setIsServed(false);
-        sendMessage();//发送消息,更新温度和费用
-    }
-
-    else if(!_satisfied)
-    {
-        if(_attribute->getIsServed())//服务中
+        if(_isServed)//服务中
         {
             qDebug() << "count:" << _count;
             if(_count != 0) //未到变化温度的时机
                 _count--;
             else            //时机已到
             {
-                if(_attribute->getMode() == Attribute::MODE_COOL)
-                    _attribute->decRoomTmp();            //降温
+                if(_mode == MODE_COOL)
+                    decDeltaRoomTmp();            //降温
                 else
-                    _attribute->incRoomTmp();            //升温
+                    incDeltaRoomTmp();            //升温
 
                 _tmpFee += 0.1;
                 _tmpKwh += 0.1;
-                _attribute->setFee(_attribute->getFee() + 0.1);
-                _attribute->setKwh(_attribute->getKwh() + 0.1);
+                _fee += 0.1;
+                _Kwh += 0.1;
 
-                if(qAbs(_attribute->getTargetTmp() - _attribute->getRoomTmp()) < 0.1)
+                //若当前为制冷模式且目标温度高于室温，则停止服务
+                qDebug() << _mode << _targetTmp << _roomTmp;
+                if(_mode == MODE_COOL && _targetTmp > _roomTmp)
                 {
-                    _attribute->setIsServed(false);
-                    sendMessage();//发送消息,停止服务
 
+                    _isSatisfied = true;
+                    _isServed = false;
+                    sendMessage();//发送消息,停止服务
                     //数据库存储
+                    _tmpFee = 0;
+                    _tmpKwh = 0;
+
                 }
                 //若当前为制热模式且室温高于目标温度，则停止服务
-                else if(_attribute->getMode() == Attribute::MODE_HEAT
-                        && _attribute->getRoomTmp() > _attribute->getTargetTmp())
+                else if(_mode == MODE_HEAT && _targetTmp < _roomTmp)
                 {
-                    _satisfied = true;
-                    _attribute->setIsServed(false);
+                    _isSatisfied = true;
+                    _isServed = false;
                     sendMessage();//发送消息,停止服务
 
                     //数据库存储
+                    _tmpFee = 0;
+                    _tmpKwh = 0;
                 }
-                else{
+                else
+                {
                     updateCount();
                     sendMessage();//发送消息,更新温度和费用
                 }
             }
-        }else{//挂起
-            _suspended++;//记录挂起时间
+            //更新UI
+            emit update(this);
+            _served++;
         }
-
-		//更新UI
-		int i = _attribute->getRoomNum();
-		_server->rooms[i].roomTmp->setText(QString::number((int)_attribute->getRoomTmp()));
-		_server->rooms[i].Kwh->setText(QString::number(_attribute->getKwh()));
-		_server->rooms[i].fee->setText(QString::number(_attribute->getFee()));
-		_server->rooms[i].status->setText(QString::number(_attribute->getIsServed()));
     }
 }
 
 void ClientBlock::updateCount()
 {
-    switch(_attribute->getWindSpeed())
+    switch(_windSpeed)
     {
-    case Attribute::SPD_LOW:
-        _count = 3*60/10.0;
+    case SPD_LOW:   //低风速每3分钟变化1温度
+        _count = 3 * 60 / 10.0;
         break;
-    case Attribute::SPD_MID:
-        _count = 2*60/10;
+    case SPD_MID:   //中风速每2分钟变化1温度
+        _count = 2 * 60 / 10;
         break;
-    case Attribute::SPD_HIGH:
-        _count = 60/10;
+    case SPD_HIGH:  //高风速每2分钟变化1温度
+        _count = 60 / 10;
+        break;
+    default:
+        _count = 100;
         break;
     }
 }
 
-Attribute* ClientBlock::getAttribute()
-{
-    return _attribute;
-}
-
 bool ClientBlock::isSatisfied()
 {
-    return _satisfied;
+    return _isSatisfied;
+}
+
+bool ClientBlock::isServed()
+{
+    return _isServed;
+}
+
+void ClientBlock::setIsServed(bool isServed)
+{
+    _isServed = isServed;
+}
+
+QJsonObject ClientBlock::toJson()
+{
+    QJsonObject json;
+    json.insert("roomNum",_roomNum);
+    json.insert("roomTmp",_roomTmp);
+    json.insert("mode",_mode);
+    json.insert("isServed", _isServed);
+    json.insert("Kwh",_Kwh);
+    json.insert("fee",_fee);
+    return json;
+}
+
+void ClientBlock::incDeltaRoomTmp()
+{
+    _roomTmp += DELTA;
+}
+
+void ClientBlock::decDeltaRoomTmp()
+{
+    _roomTmp -= DELTA;
 }
 
