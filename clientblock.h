@@ -1,4 +1,4 @@
-﻿#ifndef CLIENTBLOCK_H
+#ifndef CLIENTBLOCK_H
 #define CLIENTBLOCK_H
 
 #include <QTcpSocket>
@@ -26,13 +26,13 @@ public:
     explicit ClientBlock(QTcpSocket* socket, double lowestTmp, double highestTmp,
                          double targetTmp, int mode, QObject *parent = 0);//根据socket和主机工作模式构造CB
     ~ClientBlock();
-    int getPriority();                  //更新优先级，得到优先级，数字越小优先级越大
     void setID(int id);                 //设置客户ID
     void setIsCheckedIn(bool flag);     //设置是否check in
     int getRoomNum();                   //返回房间号
     double getRoomTmp();                //返回室温
     double getTargetTmp();              //返回目标温度
     int getWindSpeed();                 //返回风速
+    int get_Served();                   //返回服务时长
     double getFee();                    //返回费用
     double getKwh();                    //返回金额
     void check();                       //先判断是否服务完成，再判断是否被挂起（挂起不变），若不为0count--, 若count==0，变温度，再判断是否达到目标温度，改变isFinished,发消息，重制count，
@@ -59,7 +59,7 @@ private:
     int _count;                         //下次发送变温消息的计时器
     double _tmpFee;                     //本次服务的费用
     double _tmpKwh;                     //本次服务的消耗能量
-    int _suspended;                     //累计挂起的时间
+    int _served;                        //累计服务的时间
     bool _isSatisfied;                  //服务完成(达到目标温度)为true
     QString _sysTime;                   //系统时间
     int _roomNum;                       //房间号

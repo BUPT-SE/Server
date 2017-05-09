@@ -1,4 +1,4 @@
-﻿#ifndef SERVER_H
+#ifndef SERVER_H
 #define SERVER_H
 
 #include <QWidget>
@@ -59,7 +59,7 @@ private:
     int _Year, _Month, _Day, _Hour, _Min, _t;
     int _nextClientID;
     int _clientID[4];
-    void sortByWindSpeed(QList<ClientBlock*> &queue);
+    void sortByPriority(QList<ClientBlock*> &queue);
     QString _sysTime;
 };
 #endif // SERVER_H

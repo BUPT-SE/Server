@@ -1,4 +1,4 @@
-﻿#include "database.h"
+#include "database.h"
 #include "server.h"
 #include <QDebug>
 
@@ -216,7 +216,6 @@ QString database::getDetailBill(int customerId)
     return result;
 }
 
-
 QString database::getCurTime()
 {
     QDateTime Date = QDateTime::currentDateTime();
@@ -239,16 +238,4 @@ QString database::getCurTime()
 
     return sysTime;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

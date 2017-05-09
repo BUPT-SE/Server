@@ -1,4 +1,4 @@
-﻿#include "clientblock.h"
+#include "clientblock.h"
 #include <QDebug>
 
 ClientBlock::ClientBlock(QTcpSocket* socket, double lowestTmp, double highestTmp,
@@ -32,13 +32,9 @@ ClientBlock::~ClientBlock()
 
 }
 
-int ClientBlock::getPriority()
+int ClientBlock::get_Served()
 {
-    int p;//优先级越大，数字越小
-    //优先级与风速有关，风速越大，优先级越大
-    p = 3 - _windSpeed;
-
-    return p;
+    return _served;
 }
 
 void ClientBlock::setID(int id)
@@ -269,7 +265,7 @@ void ClientBlock::check()
         }
         else//挂起
         {
-            _suspended++;//记录挂起时间
+            _served = 0;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿#include <QTimer>
+#include <QTimer>
 #include <QDateTime>
 #include <QVector>
 #include <QtAlgorithms>
@@ -620,13 +620,12 @@ void Server::schedule(){//1.遍历queue把服务完成的从机放到队尾；2.
     return;
 }
 
-void Server::sortByWindSpeed(QList<ClientBlock*> &queue)
+void Server::sortByPriority(QList<ClientBlock*> &queue)
 {
     //冒泡排序
     for(int i = queue.size() - 1; i > 0; i--)
         for(int j = 0; j < i; j++)
-            if(queue[j]->getPriority() > queue[j + 1]->getPriority())
-            {
+            if((queue[j]->getWindSpeed() < queue[j + 1]->getWindSpeed())||(queue[j]->getWindSpeed() == queue[j + 1]->getWindSpeed() && queue[j]->get_Served() > queue[j + 1]->get_Served())||(queue[j]->getWindSpeed() == queue[j + 1]->getWindSpeed() && queue[j]->get_Served() == queue[j + 1]->get_Served() && queue[j]->getRoomNum() < queue[j + 1]->getRoomNum())){
                 ClientBlock* temp = queue[j];
                 queue[j] = queue[j + 1];
                 queue[j + 1] = temp;
