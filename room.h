@@ -4,7 +4,7 @@
 #include <QLabel>
 #include <QPushButton>
 
-struct room{
+struct Room{
     QLabel* id;
     QLabel* roomNum;
     QLabel* targetTmp;
@@ -14,6 +14,11 @@ struct room{
     QLabel* Kwh;
     QLabel* fee;
     QPushButton* check;
+};
+
+struct Bill{
+    double fee;
+    double Kwh;
 };
 
 #endif // ROOMS_H

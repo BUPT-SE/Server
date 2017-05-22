@@ -9,6 +9,7 @@ ConfigDialog::ConfigDialog(QWidget* parent) : QDialog(parent)
     QLabel* hostNameLabel = new QLabel(QString::fromLocal8Bit("请输入主机地址:"));
     userNameEdit = new QLineEdit;
     passwordEdit = new QLineEdit;
+    passwordEdit->setEchoMode(QLineEdit::Password);
     hostNameEdit = new QLineEdit;
 
     //网格布局

@@ -25,8 +25,6 @@ class Server : public QWidget{
 public:
     explicit Server(QWidget *parent = 0);
     ~Server();
-    void schedule();//1.遍历queue把服务完成的从机放到队尾；2.调用qSort对服务未完成的从机排序（选前三），依据优先级
-    QVector<room> rooms;
 
 private slots:
     void newConnection();
@@ -34,6 +32,7 @@ private slots:
     void onTimeOut();
     void updateUI(ClientBlock *client);//更新面板上各从机的状态
     void checkIsCheckedIn(ClientBlock *client);
+    void setBill(ClientBlock *client);
 
     void on_check1_clicked();
     void on_check2_clicked();
@@ -50,6 +49,8 @@ private slots:
     void on_detail2_clicked();
     void on_detail3_clicked();
     void on_detail4_clicked();
+    void on_deleteRecordButton_clicked();
+
 
 private:
     Ui::Server *ui;
@@ -59,7 +60,10 @@ private:
     int _Year, _Month, _Day, _Hour, _Min, _t;
     int _nextClientID;
     int _clientID[4];
-    void sortByWindSpeed(QList<ClientBlock*> &queue);
-    QString _sysTime;
+    void sortByPriority(QList<ClientBlock*> &queue);
+    void schedule();//1.遍历queue把服务完成的从机放到队尾；2.调用qSort对服务未完成的从机排序（选前三），依据优先级
+    int cnt;
+    QVector<Room> rooms;
+    QVector<Bill> bills;
 };
 #endif // SERVER_H

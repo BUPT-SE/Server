@@ -15,12 +15,14 @@
 class ClientBlock : public QObject
 {
     Q_OBJECT
-public slots:
+private slots:
     void readMessage();                 //判断请求是否合理，包括目标温度当前温度是否合理，若接收到关机请求，则发送shutdown信号
+
 signals:
     void shutdown(ClientBlock*);        //当接收到从控机的关机请求时，此信号用于通知Server销毁自己
     void update(ClientBlock*);          //更新UI
     void isCheckedIn(ClientBlock*);     //发送信号看此房间是否check in
+    void updateBill(ClientBlock*);            //发送信号从主机得到之前账单
     
 public:
     explicit ClientBlock(QTcpSocket* socket, double lowestTmp, double highestTmp,
@@ -28,19 +30,28 @@ public:
     ~ClientBlock();
     int getPriority();                  //更新优先级，得到优先级，数字越小优先级越大
     void setID(int id);                 //设置客户ID
+    int getID();                        //返回客户ID
     void setIsCheckedIn(bool flag);     //设置是否check in
     int getRoomNum();                   //返回房间号
     double getRoomTmp();                //返回室温
     double getTargetTmp();              //返回目标温度
     int getWindSpeed();                 //返回风速
+    int getMode();                      //返回模式
     double getFee();                    //返回费用
-    double getKwh();                    //返回金额
+    double getKwh();                    //返回能量
+    void setKwh(double Kwh);            //设置能量
+    void setFee(double fee);            //设置费用
     void check();                       //先判断是否服务完成，再判断是否被挂起（挂起不变），若不为0count--, 若count==0，变温度，再判断是否达到目标温度，改变isFinished,发消息，重制count，
-    void setSysTime(QString time);      //设置系统时间
     bool isSatisfied();                 //是否服务完成
     bool isServed();                    //返回是否在被服务
     void setIsServed(bool isServed);    //设置是否被服务
+    void setIsSatisfied(bool isSatisfied);//设置是否满足服务
     void sendMessage();                 //向从控机发送消息，包括变温，和被挂起
+    int getServedTime();                //返回服务时长
+    int getTmpFee();                    //返回本次服务的费用
+    int getTmpKwh();                    //返回本次服务消耗的能量
+    bool isTmpSatisfied();
+    void setTmpSatisfied(bool tmpSatisfied);
 
 public:
     QTcpSocket* _socket;                //套接字
@@ -59,9 +70,9 @@ private:
     int _count;                         //下次发送变温消息的计时器
     double _tmpFee;                     //本次服务的费用
     double _tmpKwh;                     //本次服务的消耗能量
-    int _suspended;                     //累计挂起的时间
+    int _servedTime;                    //累计服务时间
     bool _isSatisfied;                  //服务完成(达到目标温度)为true
-    QString _sysTime;                   //系统时间
+    bool _tmpSatisfied;
     int _roomNum;                       //房间号
     int _windSpeed;                     //风速，低档，中档，高档
     double _roomTmp;                    //室温
@@ -73,6 +84,7 @@ private:
     double _fee;                        //所需支付总的费用
     double _lowestTmp;                  //允许设置目标温度的最低温度
     double _highestTmp;                 //运行设置目标温度的最高温度
+    int _tmpWindSpeed;
 
 };
 

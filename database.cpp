@@ -4,7 +4,7 @@
 
 database::database()
 {
-    //连接数据库
+    //连接到数据库
     ConfigDialog cd;
     if (cd.exec() == QDialog::Accepted)
     {
@@ -47,14 +47,13 @@ database* database::getInstance()
 
 void database::insertCheck(struct operation entry)
 {
-    qDebug() << entry.time << endl;
     QSqlQuery query;
     query.prepare("INSERT INTO check_in_out "
                   "(room_id, customer_id, time, operation) "
                   "VALUE (:room_id, :customer_id, :time, :operation)");
     query.bindValue(":room_id", entry.roomId);
     query.bindValue(":customer_id", entry.customerId);
-    query.bindValue(":time", QDateTime::fromString(entry.time, "yyyy-MM-dd hh:mm:ss"));
+    query.bindValue(":time", QDateTime::fromString(getCurTime(), "yyyy-MM-dd hh:mm:ss"));
     query.bindValue(":operation", entry.oper);
     query.exec();
 }
@@ -67,7 +66,7 @@ void database::insertPower(struct operation entry)
                   "VALUE (:room_id, :customer_id, :time, :operation)");
     query.bindValue(":room_id", entry.roomId);
     query.bindValue(":customer_id", entry.customerId);
-    query.bindValue(":time", QDateTime::fromString(entry.time, "yyyy-MM-dd hh:mm:ss"));
+    query.bindValue(":time", QDateTime::fromString(getCurTime(), "yyyy-MM-dd hh:mm:ss"));
     query.bindValue(":operation", entry.oper);
     query.exec();
 }
@@ -80,8 +79,8 @@ void database::insertService(struct service entry)
                   "VALUE (:room_id, :customer_id, :start_time, :end_time, :wind_speed, :energy, :mode, :fee)");
     query.bindValue(":room_id", entry.roomId);
     query.bindValue(":customer_id", entry.customerId);
-    query.bindValue(":start_time", QDateTime::fromString(entry.startTime, "yyyy-MM-dd hh:mm:ss"));
-    query.bindValue(":end_time", QDateTime::fromString(entry.endTime, "yyyy-MM-dd hh:mm:ss"));
+    query.bindValue(":start_time", QDateTime::fromString(getCurTime(), "yyyy-MM-dd hh:mm:ss"));
+    query.bindValue(":end_time", QDateTime::fromString(getCurTime(), "yyyy-MM-dd hh:mm:ss"));
     query.bindValue(":wind_speed", entry.windSpeed);
     query.bindValue(":energy", entry.energy);
     query.bindValue(":mode", entry.mode);
@@ -112,8 +111,8 @@ QString database::getBill(int customerId)
     query.first();
     QString result = QString::fromLocal8Bit("客户:") + QString::number(customerId) + "\n" +
             QString::fromLocal8Bit("入住时间:") + checkinTime.toString("yyyy-MM-dd hh:mm:ss") + "\n" +
-            QString::fromLocal8Bit("退房时间:") + checkoutTime.toString("yyyy-MM-dd hh:mm:ss") + "\n" +
-            QString::fromLocal8Bit("总消费:") + QString::number(query.value(0).toDouble()) + QString::fromLocal8Bit("元");
+            QString::fromLocal8Bit("退房时间:") + checkoutTime.toString("yyyy-MM-dd hh:mm:ss") + "\n";
+    //        QString::fromLocal8Bit("总消费:") + QString::number(query.value(0).toDouble()) + QString::fromLocal8Bit("元");
 
     return result;
 }
@@ -186,7 +185,7 @@ QString database::getDetailBill(int customerId)
             }
 
             //详单模式信息
-            if (subquery.value(5).toInt() == 0)
+            if (subquery.value(6).toInt() == 0)
             {
                 result += QString::fromLocal8Bit("工作模式：制冷 \n");
             }
@@ -198,7 +197,7 @@ QString database::getDetailBill(int customerId)
             //详单能量费用信息
             result += QString::fromLocal8Bit("消耗能量：%1 KWH \n"
                               "该次消费金额：%2 元 \n")
-                    .arg(subquery.value(6).toDouble())
+                    .arg(subquery.value(5).toDouble())
                     .arg(subquery.value(7).toDouble());
         }
 
@@ -212,20 +211,41 @@ QString database::getDetailBill(int customerId)
     query.bindValue(":customer_id", customerId);
     query.exec();
     query.first();
-    result += QString::fromLocal8Bit("总消费:") + QString::number(query.value(0).toDouble()) + QString::fromLocal8Bit("元");
+    //result += QString::fromLocal8Bit("总消费:") + QString::number(query.value(0).toDouble()) + QString::fromLocal8Bit("元");
 
     return result;
 }
 
+QString database::getCurTime()
+{
+    QDateTime Date = QDateTime::currentDateTime();
+    QTime time = QTime::currentTime();
 
+    int year=Date.date().year();
+    int month=Date.date().month();
+    int day=Date.date().day();
+    int hour=time.hour();
+    int min=time.minute();
+    int sec = time.second();
 
+    QString sysTime;
+    sysTime = QString::number(year);
+    sysTime += "-" + QString::number(month);
+    sysTime += "-" + QString::number(day);
+    sysTime += " " + QString::number(hour);
+    sysTime += ":" + QString::number(min);
+    sysTime += ":" + QString::number(sec);
 
+    return sysTime;
+}
 
-
-
-
-
-
-
-
-
+void database::deleteAllRecords()
+{
+    QSqlQuery query;
+    query.prepare("DELETE FROM service_record");
+    query.exec();
+    query.prepare("DELETE FROM power_on_off");
+    query.exec();
+    query.prepare("DELETE FROM check_in_out");
+    query.exec();
+}

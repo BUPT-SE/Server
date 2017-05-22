@@ -1165,7 +1165,7 @@
   <widget class="QPushButton" name="offButton">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>180</x>
      <y>60</y>
      <width>91</width>
      <height>31</height>
@@ -1311,9 +1311,9 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>120</y>
+     <y>100</y>
      <width>351</width>
-     <height>111</height>
+     <height>141</height>
     </rect>
    </property>
    <property name="font">
@@ -1509,6 +1509,24 @@
     </property>
     <property name="text">
      <string>确认</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="deleteRecordButton">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>110</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>删除数据库记录</string>
     </property>
    </widget>
   </widget>

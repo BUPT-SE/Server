@@ -14,6 +14,7 @@ Server::Server(QWidget *parent) :
 {
     _t = 0;
     _nextClientID = 1;
+    cnt = 10;
     ui->setupUi(this);
 
     //初始化tcpServer监听所有的连接请求
@@ -29,7 +30,7 @@ Server::Server(QWidget *parent) :
     connect(_tcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 
     //四个房间和ui上控件指针关联
-    room room1,room2,room3,room4;
+    Room room1,room2,room3,room4;
     room1.id=ui->id1;
     room1.roomTmp=ui->roomTmp1;
     room1.roomNum=ui->roomNum1;
@@ -74,6 +75,13 @@ Server::Server(QWidget *parent) :
     rooms.push_back(room2);
     rooms.push_back(room3);
     rooms.push_back(room4);
+
+    //用于保存用户的消费金额和消耗能量
+    Bill bill;
+    bill.fee = 0;
+    bill.Kwh = 0;
+    for(int i = 0; i < 4; i++)
+        bills.append(bill);
 
     ui->paylist1->setEnabled(false);
     ui->detail1->setEnabled(false);
@@ -128,6 +136,9 @@ void Server::newConnection()
     connect(newClientBlock, SIGNAL(shutdown(ClientBlock*)), this, SLOT(disConnection(ClientBlock*)));
     connect(newClientBlock, SIGNAL(isCheckedIn(ClientBlock*)), this, SLOT(checkIsCheckedIn(ClientBlock*)));
     connect(newClientBlock, SIGNAL(update(ClientBlock*)), this, SLOT(updateUI(ClientBlock*)));
+    connect(newClientBlock, SIGNAL(updateBill(ClientBlock*)), this, SLOT(setBill(ClientBlock*)));
+    //立即调度
+    cnt = 1;
 }
 
 void Server::disConnection(ClientBlock* client)
@@ -141,6 +152,25 @@ void Server::disConnection(ClientBlock* client)
             {
                 //更新UI
                 rooms[client->getRoomNum()].status->setText(QString::fromLocal8Bit("关机"));
+                bills[client->getRoomNum()].fee = client->getFee();
+                bills[client->getRoomNum()].Kwh = client->getKwh();
+                //写入数据库
+                operation oper;
+                oper.roomId = client->getRoomNum();
+                oper.customerId = client->getID();
+                oper.oper = 1;//关机
+                database::getInstance()->insertPower(oper);
+                if(client->isSatisfied() == false)
+                {
+                    service ser;
+                    ser.customerId = client->getID();
+                    ser.roomId = client->getRoomNum();
+                    ser.mode = client->getMode();
+                    ser.energy = client->getTmpKwh();
+                    ser.fee = client->getTmpFee();
+                    ser.windSpeed = client->getWindSpeed();
+                    database::getInstance()->insertService(ser);
+                }
                 //从队列中删除
                 _queue.erase(it);
                 break;
@@ -163,6 +193,8 @@ void Server::on_check1_clicked()
         rooms[0].roomNum->setText("0");
         rooms[0].Kwh->setText("0");
         rooms[0].fee->setText("0");
+        bills[0].fee = 0;
+        bills[0].Kwh = 0;
         ui->check1->setText("Check out");
 
         //数据库写入
@@ -170,7 +202,6 @@ void Server::on_check1_clicked()
         oper.customerId = _clientID[0];
         oper.roomId = 0;
         oper.oper = 0;//check in
-        oper.time = _sysTime;
         database::getInstance()->insertCheck(oper);
     }
     else{
@@ -191,7 +222,6 @@ void Server::on_check1_clicked()
                 oper.customerId = _clientID[0];
                 oper.roomId = 0;
                 oper.oper = 1;//关机
-                oper.time = _sysTime;
                 database::getInstance()->insertPower(oper);
                 break;
             }
@@ -201,7 +231,6 @@ void Server::on_check1_clicked()
         oper.customerId = _clientID[0];
         oper.roomId = 0;
         oper.oper = 1;//check out
-        oper.time = _sysTime;
         database::getInstance()->insertCheck(oper);
     }
 }
@@ -218,6 +247,8 @@ void Server::on_check2_clicked()
         rooms[1].roomNum->setText("1");
         rooms[1].Kwh->setText("0");
         rooms[1].fee->setText("0");
+        bills[1].fee = 0;
+        bills[1].Kwh = 0;
         ui->check2->setText("Check out");
 
         //数据库写入
@@ -225,7 +256,6 @@ void Server::on_check2_clicked()
         oper.customerId = _clientID[1];
         oper.roomId = 1;
         oper.oper = 0;//check in
-        oper.time = _sysTime;
         database::getInstance()->insertCheck(oper);
     }
     else{
@@ -245,7 +275,6 @@ void Server::on_check2_clicked()
                 oper.customerId = _clientID[1];
                 oper.roomId = 1;
                 oper.oper = 1;//关机
-                oper.time = _sysTime;
                 database::getInstance()->insertPower(oper);
                 break;
             }
@@ -255,7 +284,6 @@ void Server::on_check2_clicked()
         oper.customerId = _clientID[1];
         oper.roomId = 1;
         oper.oper = 1;//check out
-        oper.time = _sysTime;
         database::getInstance()->insertCheck(oper);
     }
 }
@@ -272,6 +300,8 @@ void Server::on_check3_clicked()
         rooms[2].roomNum->setText("2");
         rooms[2].Kwh->setText("0");
         rooms[2].fee->setText("0");
+        bills[2].fee = 0;
+        bills[2].Kwh = 0;
         ui->check3->setText("Check out");
 
         //数据库写入
@@ -279,7 +309,6 @@ void Server::on_check3_clicked()
         oper.customerId = _clientID[2];
         oper.roomId = 2;
         oper.oper = 0;//check in
-        oper.time = _sysTime;
         database::getInstance()->insertCheck(oper);
     }
     else{
@@ -299,7 +328,6 @@ void Server::on_check3_clicked()
                 oper.customerId = _clientID[2];
                 oper.roomId = 2;
                 oper.oper = 1;//关机
-                oper.time = _sysTime;
                 database::getInstance()->insertPower(oper);
                 break;
             }
@@ -309,7 +337,6 @@ void Server::on_check3_clicked()
         oper.customerId = _clientID[2];
         oper.roomId = 2;
         oper.oper = 1;//check out
-        oper.time = _sysTime;
         database::getInstance()->insertCheck(oper);
     }
 }
@@ -326,6 +353,8 @@ void Server::on_check4_clicked()
         rooms[3].roomNum->setText("3");
         rooms[3].Kwh->setText("0");
         rooms[3].fee->setText("0");
+        bills[3].fee = 0;
+        bills[3].Kwh = 0;
         ui->check4->setText("Check out");
 
         //数据库写入
@@ -333,7 +362,6 @@ void Server::on_check4_clicked()
         oper.customerId = _clientID[3];
         oper.roomId = 3;
         oper.oper = 0;//check in
-        oper.time = _sysTime;
         database::getInstance()->insertCheck(oper);
     }
     else{
@@ -353,7 +381,6 @@ void Server::on_check4_clicked()
                 oper.customerId = _clientID[3];
                 oper.roomId = 3;
                 oper.oper = 1;//关机
-                oper.time = _sysTime;
                 database::getInstance()->insertPower(oper);
                 break;
             }
@@ -363,7 +390,6 @@ void Server::on_check4_clicked()
         oper.customerId = _clientID[3];
         oper.roomId = 3;
         oper.oper = 1;//check out
-        oper.time = _sysTime;
         database::getInstance()->insertCheck(oper);
     }
 }
@@ -416,17 +442,9 @@ void Server::onTimeOut()
     ui->hour->display(_Hour);
     ui->min->display(_Min);
 
-    _sysTime = QString::number(_Year);
-    _sysTime += "-" + QString::number(_Month);
-    _sysTime += "-" + QString::number(_Day);
-    _sysTime += " " + QString::number(_Hour);
-    _sysTime += ":" + QString::number(_Min);
-    _sysTime += ":" + QString::number(_t);
-
     qDebug() << "time out!";
     for(ClientBlock *client : _queue)
     {
-        client->setSysTime(_sysTime);
         client->check();
     }
     schedule();
@@ -469,6 +487,13 @@ void Server::checkIsCheckedIn(ClientBlock* client)
     }
     else
         client->setID(rooms[i].id->text().toInt());
+}
+
+void Server::setBill(ClientBlock *client)
+{
+    int i = client->getRoomNum();
+    client->setFee(bills[i].fee);
+    client->setKwh(bills[i].Kwh);
 }
 
 void Server::on_okButton_clicked()
@@ -540,109 +565,168 @@ void Server::on_offButton_clicked()
 
 void Server::on_paylist1_clicked()
 {
-    ui->output->setText(database::getInstance()->getBill(ui->id1->text().toInt()));
+    ui->output->setText(database::getInstance()->getBill(ui->id1->text().toInt())
+                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[0].fee) + '\n'
+                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[0].Kwh));
 }
 
 void Server::on_paylist2_clicked()
 {
-    ui->output->setText(database::getInstance()->getBill(ui->id2->text().toInt()));
+    ui->output->setText(database::getInstance()->getBill(ui->id2->text().toInt())
+                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[1].fee) + '\n'
+                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[1].Kwh));
 }
 
 void Server::on_paylist3_clicked()
 {
-    ui->output->setText(database::getInstance()->getBill(ui->id3->text().toInt()));
+    ui->output->setText(database::getInstance()->getBill(ui->id3->text().toInt())
+                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[2].fee) + '\n'
+                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[2].Kwh));
 }
 
 void Server::on_paylist4_clicked()
 {
-    ui->output->setText(database::getInstance()->getBill(ui->id4->text().toInt()));
+    ui->output->setText(database::getInstance()->getBill(ui->id4->text().toInt())
+                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[3].fee) + '\n'
+                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[3].Kwh));
 }
 
 void Server::on_detail1_clicked()
 {
-    ui->output->setText(database::getInstance()->getDetailBill(ui->id1->text().toInt()));
+    ui->output->setText(database::getInstance()->getDetailBill(ui->id1->text().toInt())
+                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[0].fee) + '\n'
+                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[0].Kwh));
 }
 
 void Server::on_detail2_clicked()
 {
-    ui->output->setText(database::getInstance()->getDetailBill(ui->id2->text().toInt()));
+    ui->output->setText(database::getInstance()->getDetailBill(ui->id2->text().toInt())
+                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[1].fee) + '\n'
+                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[1].Kwh));
 }
 
 void Server::on_detail3_clicked()
 {
-    ui->output->setText(database::getInstance()->getDetailBill(ui->id3->text().toInt()));
+    ui->output->setText(database::getInstance()->getDetailBill(ui->id3->text().toInt())
+                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[2].fee) + '\n'
+                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[2].Kwh));
 }
 
 void Server::on_detail4_clicked()
 {
-    ui->output->setText(database::getInstance()->getDetailBill(ui->id4->text().toInt()));
+    ui->output->setText(database::getInstance()->getDetailBill(ui->id4->text().toInt())
+                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[3].fee) + '\n'
+                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[3].Kwh));
 }
 
-void Server::schedule(){//1.遍历queue把服务完成的从机放到队尾；2.调用qSort对服务未完成的从机排序（选前三），依据优先级
-    //计数器，变为0时进行调度
-    static int cnt = 10;
+void Server::schedule()
+{   //1.遍历queue把服务完成的从机放到队尾；2.调用qSort对服务未完成的从机排序（选前三），依据优先级
+    //计数器变为0时进行调度
     if(cnt == 0){
         //服务未完成的放入queue_schedule，已完成的放入queue_satisfied
         QList<ClientBlock*> queue_schedule, queue_satisfied;
         for (int i = 0;i != _queue.size();i++){
-            if(_queue.at(i)->isSatisfied() == false)
+            if(_queue.at(i)->isTmpSatisfied() == false)
                 queue_schedule.append(_queue.at(i));
             else
                 queue_satisfied.append(_queue.at(i));
         }
-        qDebug() << "queue length:" << queue_schedule.size();
-        for (int i = 0; i != queue_schedule.size(); i++)
-        {
-            qDebug() << "room number:" <<queue_schedule[i]->getRoomNum();
-            qDebug() << "isServed:" <<queue_schedule[i]->isServed();
-            qDebug() << "isSatisfied:" <<queue_schedule[i]->isSatisfied();
+        //若queue_schedule中有少于3个从机
+        if(queue_schedule.size() < 3){
+            for (int i = 0;i != queue_satisfied.size();i++)
+                if(queue_satisfied.at(i)->isTmpSatisfied()
+                   && !queue_satisfied.at(i)->isSatisfied())
+                {
+                    queue_schedule.append(queue_satisfied.at(i));
+                    queue_satisfied.removeAt(i);
+                    i--;//vector注意！
+                }
+
         }
         //若queue_schedule中有超过3个从机，根据优先级排序
         if(queue_schedule.size() > 3){
-            sortByWindSpeed(queue_schedule);
+            sortByPriority(queue_schedule);
         }
         //将queue_schedule中最多前三个从机服务
         for(int i = 0;i != qMin(3,queue_schedule.size());i++){
             if(queue_schedule.at(i)->isServed() == false){
                 queue_schedule.at(i)->setIsServed(true);
-                qDebug() << "isServed:" << queue_schedule[i]->isServed();
+                queue_schedule.at(i)->setTmpSatisfied(false);
                 queue_schedule.at(i)->sendMessage();
+            }
+            else{
+                queue_schedule.at(i)->setIsServed(true);
+                queue_schedule.at(i)->setTmpSatisfied(false);
             }
         }
         //剩下的挂起
         for(int i = 3;i < queue_schedule.size();i++){
             if(queue_schedule.at(i)->isServed() == true){
                 queue_schedule.at(i)->setIsServed(false);
+                queue_schedule.at(i)->setTmpSatisfied(true);
                 queue_schedule.at(i)->sendMessage();
             }
+            else{
+                queue_schedule.at(i)->setIsServed(false);
+                queue_schedule.at(i)->setTmpSatisfied(true);
+            }
         }
+
+        qDebug() << "Queue_satisfied:";
+        for(int i = 0;i != queue_satisfied.size();i++)
+        {
+            qDebug() << queue_satisfied.at(i)->getRoomNum()
+                     << queue_satisfied.at(i)->isTmpSatisfied()
+                     << queue_satisfied.at(i)->isSatisfied()
+                     << queue_satisfied.at(i)->isServed();
+        }
+        qDebug() << "Queue_schedule:";
+        for(int i = 0;i != queue_schedule.size();i++)
+        {
+            qDebug() << queue_schedule.at(i)->getRoomNum()
+                     << queue_schedule.at(i)->isTmpSatisfied()
+                     << queue_schedule.at(i)->isSatisfied()
+                     << queue_schedule.at(i)->isServed();
+        }
+
         _queue.clear();
         _queue = queue_schedule + queue_satisfied;
         cnt = 10;
 
-		//更新UI
-		for (int i = 0; i < _queue.size(); i++) {
+        //更新UI
+        for (int i = 0; i < _queue.size(); i++) {
             if(_queue[i]->isServed())
-                rooms[i].status->setText(QString::fromLocal8Bit("服务"));
+                rooms[_queue[i]->getRoomNum()].status->setText(QString::fromLocal8Bit("服务"));
             else
-                rooms[i].status->setText(QString::fromLocal8Bit("挂起"));
-		}
-		
-    }else cnt --;
+                rooms[_queue[i]->getRoomNum()].status->setText(QString::fromLocal8Bit("挂起"));
+        }
+    }else cnt--;
     return;
 }
 
-void Server::sortByWindSpeed(QList<ClientBlock*> &queue)
+void Server::sortByPriority(QList<ClientBlock*> &queue)
 {
     //冒泡排序
     for(int i = queue.size() - 1; i > 0; i--)
         for(int j = 0; j < i; j++)
-            if(queue[j]->getPriority() > queue[j + 1]->getPriority())
+        {
+            if(queue[j]->getWindSpeed() < queue[j + 1]->getWindSpeed())
             {
                 ClientBlock* temp = queue[j];
                 queue[j] = queue[j + 1];
                 queue[j + 1] = temp;
             }
+            else if(queue[j]->getWindSpeed() == queue[j + 1]->getWindSpeed())
+                if(queue[j]->getServedTime() > queue[j + 1]->getServedTime())
+                {
+                    ClientBlock* temp = queue[j];
+                    queue[j] = queue[j + 1];
+                    queue[j + 1] = temp;
+                }
+        }
 }
 
-
+void Server::on_deleteRecordButton_clicked()
+{
+    database::getInstance()->deleteAllRecords();
+}
