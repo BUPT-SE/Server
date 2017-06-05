@@ -22,7 +22,8 @@ signals:
     void shutdown(ClientBlock*);        //当接收到从控机的关机请求时，此信号用于通知Server销毁自己
     void update(ClientBlock*);          //更新UI
     void isCheckedIn(ClientBlock*);     //发送信号看此房间是否check in
-    void updateBill(ClientBlock*);            //发送信号从主机得到之前账单
+    void updateBill(ClientBlock*);      //发送信号从主机得到之前账单
+    void dispatch();                    //申请立即调度
     
 public:
     explicit ClientBlock(QTcpSocket* socket, double lowestTmp, double highestTmp,
@@ -62,7 +63,8 @@ private:
     void setFromJson(int flag, QByteArray byteArray);//从Json格式改变属性值
     void incDeltaRoomTmp();             //室温升0.1度
     void decDeltaRoomTmp();             //室温降0.1度
-    void sendFirstMessage();
+    void sendFirstMessage();            //读取第一个信息
+    QString getCurTime();               //得到现在的时间
 
 private:
     int _id;                            //客户id
@@ -70,6 +72,7 @@ private:
     int _count;                         //下次发送变温消息的计时器
     double _tmpFee;                     //本次服务的费用
     double _tmpKwh;                     //本次服务的消耗能量
+    QString _startTime;                 //本次服务的起止时间
     int _servedTime;                    //累计服务时间
     bool _isSatisfied;                  //服务完成(达到目标温度)为true
     bool _tmpSatisfied;

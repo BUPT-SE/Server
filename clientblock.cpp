@@ -151,6 +151,7 @@ void ClientBlock::readMessage()
                 _roomNum = roomNum.toInt();
                 _roomTmp = roomTmp.toDouble();
                 _windSpeed = windSpeed.toInt();
+                _tmpWindSpeed = _windSpeed;
                 _power = power.toBool();
 
                 emit isCheckedIn(this);
@@ -163,6 +164,8 @@ void ClientBlock::readMessage()
                 }
                 //同步账单信息
                 emit updateBill(this);
+                //记录服务起始时间
+                _startTime = getCurTime();
                 //发送第一条消息
                 sendFirstMessage();
                 updateCount();
@@ -184,11 +187,13 @@ void ClientBlock::readMessage()
                 _socket->disconnectFromHost();
                 //销毁自身
                 emit shutdown(this);
-                return ;
+                return;
             }
             //被挂起时从机向主机同步室温
             if(_isServed == false && _isSatisfied == false)
             {
+               //记录服务起始时间
+               _startTime = getCurTime();
                if(qAbs(roomTmp.toDouble() - _roomTmp) >= 1)
                {
                    _roomTmp = roomTmp.toDouble();
@@ -201,6 +206,7 @@ void ClientBlock::readMessage()
                    _windSpeed = windSpeed.toInt();
                    _tmpSatisfied = false;
                    updateCount();
+                   emit dispatch();
                }
             }
             //满足服务后从机向主机同步室温
@@ -208,6 +214,8 @@ void ClientBlock::readMessage()
             {
                if(qAbs(roomTmp.toDouble() - _roomTmp) >= 1)
                {
+                   //记录服务起始时间
+                   _startTime = getCurTime();
                    _roomTmp = roomTmp.toDouble();
                    _isSatisfied = false;
                    _tmpSatisfied = false;
@@ -215,14 +223,20 @@ void ClientBlock::readMessage()
                _targetTmp = targetTmp.toDouble();
                if(windSpeed.toInt() != _windSpeed)
                {
+                   //记录服务起始时间
+                   _startTime = getCurTime();
                    _windSpeed = windSpeed.toInt();
                    _isSatisfied = false;
                    _tmpSatisfied = false;
                    updateCount();
+                   emit dispatch();
                }
             }
             else if(_isServed)
             {
+                qDebug() << "!!!!!!@@@@";
+                //记录服务起始时间
+                _startTime = getCurTime();
                 _targetTmp = targetTmp.toDouble();
                 if(windSpeed.toInt() != _windSpeed)
                 {
@@ -241,6 +255,7 @@ void ClientBlock::readMessage()
             ser.energy = _tmpKwh;
             ser.fee = _tmpFee;
             ser.windSpeed = _windSpeed;
+            ser.startTime = _startTime;
             database::getInstance()->insertService(ser);
 
             _tmpFee = 0;
@@ -293,6 +308,7 @@ void ClientBlock::check()
                     ser.energy = _tmpKwh;
                     ser.fee = _tmpFee;
                     ser.windSpeed = _windSpeed;
+                    ser.startTime = _startTime;
                     database::getInstance()->insertService(ser);
                     _tmpFee = 0;
                     _tmpKwh = 0;
@@ -312,6 +328,7 @@ void ClientBlock::check()
                     ser.energy = _tmpKwh;
                     ser.fee = _tmpFee;
                     ser.windSpeed = _windSpeed;
+                    ser.startTime = _startTime;
                     database::getInstance()->insertService(ser);
                     _tmpFee = 0;
                     _tmpKwh = 0;
@@ -334,6 +351,7 @@ void ClientBlock::check()
 
 void ClientBlock::updateCount()
 {
+    qDebug() << "tmpWindSpeed" << _tmpWindSpeed;
     if(_tmpWindSpeed != -1)
     {
         int c;
@@ -352,13 +370,13 @@ void ClientBlock::updateCount()
         switch(_windSpeed)
         {
         case SPD_LOW:   //低风速每3分钟变化1温度
-            _count = _count / c * 18;
+            _count = 18 * _count / c;
             break;
         case SPD_MID:   //中风速每2分钟变化1温度
-            _count = _count / c * 12;
+            _count = 12 * _count / c;
             break;
         case SPD_HIGH:  //高风速每2分钟变化1温度
-            _count = _count / c * 6;
+            _count = 6 * _count / c;
             break;
         }
         _tmpWindSpeed = -1;
@@ -449,4 +467,25 @@ void ClientBlock::setTmpSatisfied(bool tmpSatisfied)
     _tmpSatisfied = tmpSatisfied;
 }
 
+QString ClientBlock::getCurTime()
+{
+    QDateTime Date = QDateTime::currentDateTime();
+    QTime time = QTime::currentTime();
 
+    int year=Date.date().year();
+    int month=Date.date().month();
+    int day=Date.date().day();
+    int hour=time.hour();
+    int min=time.minute();
+    int sec = time.second();
+
+    QString sysTime;
+    sysTime = QString::number(year);
+    sysTime += "-" + QString::number(month);
+    sysTime += "-" + QString::number(day);
+    sysTime += " " + QString::number(hour);
+    sysTime += ":" + QString::number(min);
+    sysTime += ":" + QString::number(sec);
+
+    return sysTime;
+}

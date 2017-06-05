@@ -12,9 +12,8 @@ Server::Server(QWidget *parent) :
     ui(new Ui::Server),
     _timer(new QTimer())
 {
-    _t = 0;
     _nextClientID = 1;
-    cnt = 10;
+    cnt = 5;
     ui->setupUi(this);
 
     //初始化tcpServer监听所有的连接请求
@@ -137,6 +136,7 @@ void Server::newConnection()
     connect(newClientBlock, SIGNAL(isCheckedIn(ClientBlock*)), this, SLOT(checkIsCheckedIn(ClientBlock*)));
     connect(newClientBlock, SIGNAL(update(ClientBlock*)), this, SLOT(updateUI(ClientBlock*)));
     connect(newClientBlock, SIGNAL(updateBill(ClientBlock*)), this, SLOT(setBill(ClientBlock*)));
+    connect(newClientBlock, SIGNAL(dispatch()), this, SLOT(setCnt()));
     //立即调度
     cnt = 1;
 }
@@ -409,40 +409,23 @@ void Server::on_onButton_clicked()
     ui->hour->setEnabled(true);
     ui->min->setEnabled(true);
     ui->sec->setEnabled(true);
-    QDateTime Date=QDateTime::currentDateTime();
-    QTime time=QTime::currentTime();
-    _Year=Date.date().year();
-    _Month=Date.date().month();
-    _Day=Date.date().day();
-    _Hour=time.hour();
-    _Min=time.minute();
-    _t = time.second();
+    _date=QDateTime::currentDateTime();
+    _time=QTime::currentTime();
     _timer->start(1000);
 }
 
 void Server::onTimeOut()
 {
-    _t++;
-    if(_t == 60){
-        _t = 0;
-        _Min++;
-        if(_Min==60){
-            _Min=0;
-            _Hour++;
-            if(_Hour==24){
-                _Hour=0;
-                _Day++;
-            }
-        }
-    }
-    ui->sec->display(_t);
-    ui->year->display(_Year);
-    ui->month->display(_Month);
-    ui->day->display(_Day);
-    ui->hour->display(_Hour);
-    ui->min->display(_Min);
-
     qDebug() << "time out!";
+    _date = QDateTime::currentDateTime();
+    _time = QTime::currentTime();
+    ui->year->display(_date.date().year());
+    ui->month->display(_date.date().month());
+    ui->day->display(_date.date().day());
+    ui->hour->display(_time.hour());
+    ui->min->display(_time.minute());
+    ui->sec->display(_time.second());
+
     for(ClientBlock *client : _queue)
     {
         client->check();
@@ -452,7 +435,7 @@ void Server::onTimeOut()
 
 void Server::updateUI(ClientBlock* client)
 {
-    //qDebug() << "更新UI！！！";
+    //qDebug() << "更新UI!!!";
     int i = client->getRoomNum();
     rooms[i].roomTmp->setText(QString::number(qRound(client->getRoomTmp())));
     rooms[i].targetTmp->setText(QString::number(qRound(client->getTargetTmp())));
@@ -494,6 +477,11 @@ void Server::setBill(ClientBlock *client)
     int i = client->getRoomNum();
     client->setFee(bills[i].fee);
     client->setKwh(bills[i].Kwh);
+}
+
+void Server::setCnt()
+{
+    cnt = 1;
 }
 
 void Server::on_okButton_clicked()
@@ -565,58 +553,102 @@ void Server::on_offButton_clicked()
 
 void Server::on_paylist1_clicked()
 {
-    ui->output->setText(database::getInstance()->getBill(ui->id1->text().toInt())
-                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[0].fee) + '\n'
-                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[0].Kwh));
+    QString content = database::getInstance()->getBill(ui->id1->text().toInt())
+                    + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[0].fee) + '\n'
+                    + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[0].Kwh);
+    ui->output->setText(content);
 }
 
 void Server::on_paylist2_clicked()
 {
-    ui->output->setText(database::getInstance()->getBill(ui->id2->text().toInt())
-                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[1].fee) + '\n'
-                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[1].Kwh));
+    QString content = database::getInstance()->getBill(ui->id1->text().toInt())
+                    + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[1].fee) + '\n'
+                    + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[1].Kwh);
+    ui->output->setText(content);
 }
 
 void Server::on_paylist3_clicked()
 {
-    ui->output->setText(database::getInstance()->getBill(ui->id3->text().toInt())
-                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[2].fee) + '\n'
-                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[2].Kwh));
+    QString content = database::getInstance()->getBill(ui->id1->text().toInt())
+                    + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[2].fee) + '\n'
+                    + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[2].Kwh);
+    ui->output->setText(content);
 }
 
 void Server::on_paylist4_clicked()
 {
-    ui->output->setText(database::getInstance()->getBill(ui->id4->text().toInt())
-                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[3].fee) + '\n'
-                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[3].Kwh));
+    QString content = database::getInstance()->getBill(ui->id1->text().toInt())
+                    + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[3].fee) + '\n'
+                    + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[3].Kwh);
+    ui->output->setText(content);
 }
 
 void Server::on_detail1_clicked()
-{
-    ui->output->setText(database::getInstance()->getDetailBill(ui->id1->text().toInt())
-                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[0].fee) + '\n'
-                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[0].Kwh));
+{   
+    QString content = database::getInstance()->getDetailBill(ui->id1->text().toInt())
+                    + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[0].fee) + '\n'
+                    + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[0].Kwh);
+    ui->output->setText(content);
+    QFile file(ROOM0_PATH);
+    if (!file.open(QIODevice::WriteOnly|QIODevice::Text))
+    {
+        QMessageBox::critical(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("无法创建文件"));
+    }
+    QTextStream out(&file);
+    out << content << endl;
+    out.flush();
+    file.close();
 }
 
 void Server::on_detail2_clicked()
 {
-    ui->output->setText(database::getInstance()->getDetailBill(ui->id2->text().toInt())
-                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[1].fee) + '\n'
-                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[1].Kwh));
+    QString content = database::getInstance()->getDetailBill(ui->id1->text().toInt())
+                    + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[1].fee) + '\n'
+                    + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[1].Kwh);
+    ui->output->setText(content);
+    QFile file(ROOM1_PATH);
+    if (!file.open(QIODevice::WriteOnly|QIODevice::Text))
+    {
+        QMessageBox::critical(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("无法创建文件"));
+    }
+    QTextStream out(&file);
+    out << content << endl;
+    out.flush();
+    file.close();
 }
 
 void Server::on_detail3_clicked()
 {
-    ui->output->setText(database::getInstance()->getDetailBill(ui->id3->text().toInt())
-                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[2].fee) + '\n'
-                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[2].Kwh));
+    QString content = database::getInstance()->getDetailBill(ui->id1->text().toInt())
+                    + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[2].fee) + '\n'
+                    + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[2].Kwh);
+    ui->output->setText(content);
+    QFile file(ROOM2_PATH);
+    if (!file.open(QIODevice::WriteOnly|QIODevice::Text))
+    {
+        QMessageBox::critical(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("无法创建文件"));
+    }
+    QTextStream out(&file);
+    out << content << endl;
+    out.flush();
+    file.close();
 }
 
 void Server::on_detail4_clicked()
 {
-    ui->output->setText(database::getInstance()->getDetailBill(ui->id4->text().toInt())
-                        + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[3].fee) + '\n'
-                        + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[3].Kwh));
+    QString content = database::getInstance()->getDetailBill(ui->id1->text().toInt())
+                    + QString::fromLocal8Bit("总消费金额：") + QString::number(bills[3].fee) + '\n'
+                    + QString::fromLocal8Bit("总消耗能量：") + QString::number(bills[3].Kwh);
+    ui->output->setText(content);
+    QFile file(ROOM3_PATH);
+    if (!file.open(QIODevice::WriteOnly|QIODevice::Text))
+    {
+        QMessageBox::critical(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("无法创建文件"));
+    }
+    QTextStream out(&file);
+    out << content << endl;
+    out.flush();
+    file.close();
 }
 
 void Server::schedule()
@@ -691,7 +723,7 @@ void Server::schedule()
 
         _queue.clear();
         _queue = queue_schedule + queue_satisfied;
-        cnt = 10;
+        cnt = 5;
 
         //更新UI
         for (int i = 0; i < _queue.size(); i++) {

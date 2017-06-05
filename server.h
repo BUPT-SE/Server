@@ -8,10 +8,16 @@
 #include <QLabel>
 #include <QDateTime>
 #include <QTimer>
+#include <QMessageBox>
 #include "clientblock.h"
 #include "room.h"
 #include "database.h"
 #include "configdialog.h"
+
+#define ROOM0_PATH "room0.txt"
+#define ROOM1_PATH "room1.txt"
+#define ROOM2_PATH "room2.txt"
+#define ROOM3_PATH "room3.txt"
 
 namespace Ui {
     class Server;
@@ -33,6 +39,7 @@ private slots:
     void updateUI(ClientBlock *client);//更新面板上各从机的状态
     void checkIsCheckedIn(ClientBlock *client);
     void setBill(ClientBlock *client);
+    void setCnt();                      //设置cnt立即调度
 
     void on_check1_clicked();
     void on_check2_clicked();
@@ -57,7 +64,8 @@ private:
     QTcpServer *_tcpServer;
     QList<ClientBlock *> _queue;//存四个从控机，最多前三个是正在被服务
     QTimer *_timer;
-    int _Year, _Month, _Day, _Hour, _Min, _t;
+    QDateTime _date;
+    QTime _time;
     int _nextClientID;
     int _clientID[4];
     void sortByPriority(QList<ClientBlock*> &queue);

@@ -20,6 +20,7 @@ struct service
 {
     int roomId;         //房间号
     int customerId;     //客户号
+    QString startTime;  //起始时间
     int windSpeed;      //风速
     int mode;           //模式
     double energy;      //能耗
@@ -33,6 +34,7 @@ private:
     ~database();
     static database* instance;
     QSqlDatabase _db;
+    QString _filePath;
 
 public:
     static database* getInstance();

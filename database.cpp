@@ -53,7 +53,7 @@ void database::insertCheck(struct operation entry)
                   "VALUE (:room_id, :customer_id, :time, :operation)");
     query.bindValue(":room_id", entry.roomId);
     query.bindValue(":customer_id", entry.customerId);
-    query.bindValue(":time", QDateTime::fromString(getCurTime(), "yyyy-MM-dd hh:mm:ss"));
+    query.bindValue(":time", getCurTime());
     query.bindValue(":operation", entry.oper);
     query.exec();
 }
@@ -66,7 +66,7 @@ void database::insertPower(struct operation entry)
                   "VALUE (:room_id, :customer_id, :time, :operation)");
     query.bindValue(":room_id", entry.roomId);
     query.bindValue(":customer_id", entry.customerId);
-    query.bindValue(":time", QDateTime::fromString(getCurTime(), "yyyy-MM-dd hh:mm:ss"));
+    query.bindValue(":time", getCurTime());
     query.bindValue(":operation", entry.oper);
     query.exec();
 }
@@ -79,8 +79,8 @@ void database::insertService(struct service entry)
                   "VALUE (:room_id, :customer_id, :start_time, :end_time, :wind_speed, :energy, :mode, :fee)");
     query.bindValue(":room_id", entry.roomId);
     query.bindValue(":customer_id", entry.customerId);
-    query.bindValue(":start_time", QDateTime::fromString(getCurTime(), "yyyy-MM-dd hh:mm:ss"));
-    query.bindValue(":end_time", QDateTime::fromString(getCurTime(), "yyyy-MM-dd hh:mm:ss"));
+    query.bindValue(":start_time", entry.startTime);
+    query.bindValue(":end_time", getCurTime());
     query.bindValue(":wind_speed", entry.windSpeed);
     query.bindValue(":energy", entry.energy);
     query.bindValue(":mode", entry.mode);
@@ -112,7 +112,7 @@ QString database::getBill(int customerId)
     QString result = QString::fromLocal8Bit("客户:") + QString::number(customerId) + "\n" +
             QString::fromLocal8Bit("入住时间:") + checkinTime.toString("yyyy-MM-dd hh:mm:ss") + "\n" +
             QString::fromLocal8Bit("退房时间:") + checkoutTime.toString("yyyy-MM-dd hh:mm:ss") + "\n";
-    //        QString::fromLocal8Bit("总消费:") + QString::number(query.value(0).toDouble()) + QString::fromLocal8Bit("元");
+    //      QString::fromLocal8Bit("总消费:") + QString::number(query.value(0).toDouble()) + QString::fromLocal8Bit("元");
 
     return result;
 }
